@@ -18,42 +18,12 @@ const navLinks = [
 ];
 
 const sections = [
-  {
-    title: "The Event",
-    desc: "RnB Nights — our debut. Date, lineup, location, dress code.",
-    icon: CalendarDays,
-    href: "/event",
-  },
-  {
-    title: "Tickets",
-    desc: "GA, VIP, and table reservations. Limited seats — first come.",
-    icon: Ticket,
-    href: "/tickets",
-  },
-  {
-    title: "Merch",
-    desc: "Wear the night. Limited drops tied to each event.",
-    icon: ShoppingBag,
-    href: "/merch",
-  },
-  {
-    title: "Playlists",
-    desc: "Relive the sets. Curated DJ mixes from previous nights.",
-    icon: Disc3,
-    href: "/playlists",
-  },
-  {
-    title: "Brands",
-    desc: "The labels and partners shaping every Xperience.",
-    icon: Sparkles,
-    href: "/brands",
-  },
-  {
-    title: "The Team",
-    desc: "Meet the curators. Get in touch directly.",
-    icon: Users,
-    href: "/team",
-  },
+  { title: "The Event", desc: "RnB Nights — our debut. Date, lineup, location, dress code.", icon: CalendarDays, to: "/event" as const },
+  { title: "Tickets", desc: "GA, VIP, and table reservations. Limited seats — first come.", icon: Ticket, to: "/tickets" as const },
+  { title: "Merch", desc: "Wear the night. Limited drops tied to each event.", icon: ShoppingBag, to: "/merch" as const },
+  { title: "Playlists", desc: "Relive the sets. Curated DJ mixes from previous nights.", icon: Disc3, to: "/playlists" as const },
+  { title: "Brands", desc: "The labels and partners shaping every Xperience.", icon: Sparkles, to: "/brands" as const },
+  { title: "The Team", desc: "Meet the curators. Get in touch directly.", icon: Users, to: "/team" as const },
 ];
 
 function Index() {
@@ -89,13 +59,13 @@ function Index() {
           </p>
           <div className="mt-10 flex flex-wrap items-center gap-4">
             <Button asChild size="lg" className="group rounded-full bg-primary px-8 text-primary-foreground hover:bg-primary/90">
-              <a href="/signup">
+              <Link to="/signup">
                 Reserve your spot
                 <ArrowUpRight className="ml-1 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-              </a>
+              </Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="rounded-full border-foreground/20 bg-transparent px-8 text-foreground hover:bg-foreground/5">
-              <a href="/event">View the event</a>
+              <Link to="/event">View the event</Link>
             </Button>
           </div>
         </div>
@@ -174,9 +144,9 @@ function Index() {
 
           <div className="grid gap-px overflow-hidden rounded-2xl border border-border/60 bg-border/40 sm:grid-cols-2 lg:grid-cols-3">
             {sections.map((s) => (
-              <a
+              <Link
                 key={s.title}
-                href={s.href}
+                to={s.to}
                 className="group relative flex min-h-[280px] flex-col justify-between bg-card p-8 transition-colors hover:bg-card/60"
               >
                 <s.icon className="h-8 w-8 text-primary transition-transform group-hover:scale-110" />
@@ -188,7 +158,7 @@ function Index() {
                     <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                   </div>
                 </div>
-              </a>
+              </Link>
             ))}
           </div>
         </div>
@@ -224,10 +194,10 @@ function Index() {
             </dl>
             <div className="mt-10 flex flex-wrap gap-4">
               <Button asChild size="lg" className="rounded-full bg-primary px-8 text-primary-foreground hover:bg-primary/90">
-                <a href="/tickets">Get tickets</a>
+                <Link to="/tickets">Get tickets</Link>
               </Button>
               <Button asChild variant="ghost" size="lg" className="rounded-full px-8 text-foreground hover:bg-foreground/5">
-                <a href="/event">Full lineup →</a>
+                <Link to="/event">Full lineup →</Link>
               </Button>
             </div>
           </div>
@@ -266,10 +236,10 @@ function Index() {
           </p>
           <div className="mt-10 flex flex-wrap justify-center gap-4">
             <Button asChild size="lg" className="rounded-full bg-primary px-10 text-primary-foreground hover:bg-primary/90">
-              <a href="/signup">Create account</a>
+              <Link to="/signup">Create account</Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="rounded-full border-foreground/20 bg-transparent px-10 hover:bg-foreground/5">
-              <a href="/login">Sign in</a>
+              <Link to="/login">Sign in</Link>
             </Button>
           </div>
         </div>
