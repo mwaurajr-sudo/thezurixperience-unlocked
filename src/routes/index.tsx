@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowUpRight, Ticket, ShoppingBag, Disc3, Sparkles, Users, CalendarDays, Lock } from "lucide-react";
 import heroImg from "@/assets/hero-rnb.jpg";
 import { Button } from "@/components/ui/button";
+import { SiteHeader } from "@/components/SiteHeader";
 
 export const Route = createFileRoute("/")({
   component: Index,
