@@ -72,14 +72,14 @@ function TicketsPage() {
       title={<>Pick your <span className="italic text-primary">entry</span></>}
       description="Capacity is intentionally small. Once a tier is gone, it's gone."
     >
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-5 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
         {tiers.map((t) => (
           <div
             key={t.name}
-            className={`rounded-2xl border p-8 ${t.featured ? "border-primary bg-primary/5" : "border-border/60 bg-card/40"}`}
+            className={`rounded-2xl border p-6 sm:p-8 ${t.featured ? "border-primary bg-primary/5" : "border-border/60 bg-card/40"}`}
           >
             <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{t.name}</div>
-            <div className="font-display mt-3 text-4xl font-bold">{t.price}</div>
+            <div className="font-display mt-3 text-3xl font-bold sm:text-4xl">{t.price}</div>
             <ul className="mt-6 space-y-2 text-sm text-muted-foreground">
               {t.perks.map((p) => <li key={p}>· {p}</li>)}
             </ul>
@@ -146,10 +146,10 @@ function CheckoutDialog({ tier, onClose }: { tier: Tier | null; onClose: () => v
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && handleClose()}>
-      <DialogContent className="border-border/60 bg-card/95 backdrop-blur sm:max-w-md">
+      <DialogContent className="max-h-[90vh] overflow-y-auto border-border/60 bg-card/95 backdrop-blur sm:max-w-md">
         <DialogHeader>
           <p className="text-xs uppercase tracking-[0.3em] text-primary">— M-Pesa</p>
-          <DialogTitle className="font-display text-3xl font-bold">
+          <DialogTitle className="font-display text-2xl font-bold sm:text-3xl">
             {tier?.name} · {tier?.price}
           </DialogTitle>
           <DialogDescription>
