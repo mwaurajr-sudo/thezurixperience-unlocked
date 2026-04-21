@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { LogOut, Menu, User as UserIcon, X } from "lucide-react";
+import { LogOut, Menu, User as UserIcon, X, ShieldCheck } from "lucide-react";
 
 const navLinks = [
   { label: "Event", to: "/event" as const },
@@ -17,6 +18,14 @@ export function SiteHeader() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (!user) { setIsAdmin(false); return; }
+    supabase
+      .rpc("has_role", { _role: "admin", _user_id: user.id })
+      .then(({ data }) => setIsAdmin(!!data));
+  }, [user]);
 
   const handleSignOut = async () => {
     setOpen(false);
@@ -47,6 +56,14 @@ export function SiteHeader() {
         <div className="flex items-center gap-2">
           {user ? (
             <>
+              {isAdmin && (
+                <Button asChild variant="ghost" size="sm" className="rounded-full text-xs uppercase tracking-[0.2em] text-primary hover:text-primary">
+                  <Link to="/admin">
+                    <ShieldCheck className="h-4 w-4" />
+                    <span className="hidden sm:inline">Admin</span>
+                  </Link>
+                </Button>
+              )}
               <Button asChild variant="ghost" size="sm" className="rounded-full text-xs uppercase tracking-[0.2em]">
                 <Link to="/account">
                   <UserIcon className="h-4 w-4" />
@@ -117,12 +134,23 @@ export function SiteHeader() {
                 Sign in
               </Link>
             ) : (
-              <button
-                onClick={handleSignOut}
-                className="mt-3 flex items-center gap-2 py-3 text-left text-sm uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground"
-              >
-                <LogOut className="h-4 w-4" /> Sign out
-              </button>
+              <>
+                {isAdmin && (
+                  <Link
+                    to="/admin"
+                    onClick={() => setOpen(false)}
+                    className="border-b border-border/30 py-3 text-sm uppercase tracking-[0.2em] text-primary hover:text-primary/80"
+                  >
+                    Admin panel
+                  </Link>
+                )}
+                <button
+                  onClick={handleSignOut}
+                  className="mt-3 flex items-center gap-2 py-3 text-left text-sm uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground"
+                >
+                  <LogOut className="h-4 w-4" /> Sign out
+                </button>
+              </>
             )}
           </nav>
         </div>
