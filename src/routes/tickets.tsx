@@ -149,7 +149,7 @@ function CheckoutDialog({ tier, onClose }: { tier: Tier | null; onClose: () => v
       <DialogContent className="max-h-[90vh] overflow-y-auto border-border/60 bg-card/95 backdrop-blur sm:max-w-md">
         <DialogHeader>
           <p className="text-xs uppercase tracking-[0.3em] text-primary">— M-Pesa</p>
-          <DialogTitle className="font-display text-3xl font-bold">
+          <DialogTitle className="font-display text-2xl font-bold sm:text-3xl">
             {tier?.name} · {tier?.price}
           </DialogTitle>
           <DialogDescription>
