@@ -9,12 +9,12 @@ export const Route = createFileRoute("/")({
 });
 
 const navLinks = [
-  { label: "Event", href: "/event" },
-  { label: "Tickets", href: "/tickets" },
-  { label: "Merch", href: "/merch" },
-  { label: "Playlists", href: "/playlists" },
-  { label: "Brands", href: "/brands" },
-  { label: "Team", href: "/team" },
+  { label: "Event", to: "/event" as const },
+  { label: "Tickets", to: "/tickets" as const },
+  { label: "Merch", to: "/merch" as const },
+  { label: "Playlists", to: "/playlists" as const },
+  { label: "Brands", to: "/brands" as const },
+  { label: "Team", to: "/team" as const },
 ];
 
 const sections = [
@@ -262,7 +262,7 @@ function Index() {
             <ul className="mt-4 space-y-2 text-sm">
               {navLinks.map((l) => (
                 <li key={l.label}>
-                  <a href={l.href} className="text-foreground/80 transition-colors hover:text-primary">{l.label}</a>
+                  <Link to={l.to} className="text-foreground/80 transition-colors hover:text-primary">{l.label}</Link>
                 </li>
               ))}
             </ul>
