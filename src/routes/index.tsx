@@ -59,36 +59,7 @@ const sections = [
 function Index() {
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* NAV */}
-      <header className="fixed inset-x-0 top-0 z-50 border-b border-border/40 bg-background/70 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-          <Link to="/" className="font-display text-lg font-bold tracking-tight">
-            <span className="text-primary">Zuri</span>Xperience
-          </Link>
-          <nav className="hidden items-center gap-8 md:flex">
-            {navLinks.map((l) => (
-              <a
-                key={l.label}
-                href={l.href}
-                className="text-xs uppercase tracking-[0.2em] text-muted-foreground transition-colors hover:text-foreground"
-              >
-                {l.label}
-              </a>
-            ))}
-          </nav>
-          <div className="flex items-center gap-2">
-            <a
-              href="/login"
-              className="hidden text-xs uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground sm:inline-block"
-            >
-              Sign in
-            </a>
-            <Button asChild size="sm" className="rounded-full bg-primary px-5 text-primary-foreground hover:bg-primary/90">
-              <a href="/signup">Join</a>
-            </Button>
-          </div>
-        </div>
-      </header>
+      <SiteHeader />
 
       {/* HERO */}
       <section className="relative grain isolate flex min-h-screen items-end overflow-hidden">
