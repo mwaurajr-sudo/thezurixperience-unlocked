@@ -9,19 +9,55 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TicketsRouteImport } from './routes/tickets'
+import { Route as TeamRouteImport } from './routes/team'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as PlaylistsRouteImport } from './routes/playlists'
+import { Route as MerchRouteImport } from './routes/merch'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as EventRouteImport } from './routes/event'
+import { Route as BrandsRouteImport } from './routes/brands'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as IndexRouteImport } from './routes/index'
 
+const TicketsRoute = TicketsRouteImport.update({
+  id: '/tickets',
+  path: '/tickets',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TeamRoute = TeamRouteImport.update({
+  id: '/team',
+  path: '/team',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlaylistsRoute = PlaylistsRouteImport.update({
+  id: '/playlists',
+  path: '/playlists',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MerchRoute = MerchRouteImport.update({
+  id: '/merch',
+  path: '/merch',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventRoute = EventRouteImport.update({
+  id: '/event',
+  path: '/event',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BrandsRoute = BrandsRouteImport.update({
+  id: '/brands',
+  path: '/brands',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AccountRoute = AccountRouteImport.update({
@@ -38,39 +74,108 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
+  '/brands': typeof BrandsRoute
+  '/event': typeof EventRoute
   '/login': typeof LoginRoute
+  '/merch': typeof MerchRoute
+  '/playlists': typeof PlaylistsRoute
   '/signup': typeof SignupRoute
+  '/team': typeof TeamRoute
+  '/tickets': typeof TicketsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
+  '/brands': typeof BrandsRoute
+  '/event': typeof EventRoute
   '/login': typeof LoginRoute
+  '/merch': typeof MerchRoute
+  '/playlists': typeof PlaylistsRoute
   '/signup': typeof SignupRoute
+  '/team': typeof TeamRoute
+  '/tickets': typeof TicketsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
+  '/brands': typeof BrandsRoute
+  '/event': typeof EventRoute
   '/login': typeof LoginRoute
+  '/merch': typeof MerchRoute
+  '/playlists': typeof PlaylistsRoute
   '/signup': typeof SignupRoute
+  '/team': typeof TeamRoute
+  '/tickets': typeof TicketsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/account' | '/login' | '/signup'
+  fullPaths:
+    | '/'
+    | '/account'
+    | '/brands'
+    | '/event'
+    | '/login'
+    | '/merch'
+    | '/playlists'
+    | '/signup'
+    | '/team'
+    | '/tickets'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/account' | '/login' | '/signup'
-  id: '__root__' | '/' | '/account' | '/login' | '/signup'
+  to:
+    | '/'
+    | '/account'
+    | '/brands'
+    | '/event'
+    | '/login'
+    | '/merch'
+    | '/playlists'
+    | '/signup'
+    | '/team'
+    | '/tickets'
+  id:
+    | '__root__'
+    | '/'
+    | '/account'
+    | '/brands'
+    | '/event'
+    | '/login'
+    | '/merch'
+    | '/playlists'
+    | '/signup'
+    | '/team'
+    | '/tickets'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccountRoute: typeof AccountRoute
+  BrandsRoute: typeof BrandsRoute
+  EventRoute: typeof EventRoute
   LoginRoute: typeof LoginRoute
+  MerchRoute: typeof MerchRoute
+  PlaylistsRoute: typeof PlaylistsRoute
   SignupRoute: typeof SignupRoute
+  TeamRoute: typeof TeamRoute
+  TicketsRoute: typeof TicketsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/tickets': {
+      id: '/tickets'
+      path: '/tickets'
+      fullPath: '/tickets'
+      preLoaderRoute: typeof TicketsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/team': {
+      id: '/team'
+      path: '/team'
+      fullPath: '/team'
+      preLoaderRoute: typeof TeamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/signup': {
       id: '/signup'
       path: '/signup'
@@ -78,11 +183,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/playlists': {
+      id: '/playlists'
+      path: '/playlists'
+      fullPath: '/playlists'
+      preLoaderRoute: typeof PlaylistsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/merch': {
+      id: '/merch'
+      path: '/merch'
+      fullPath: '/merch'
+      preLoaderRoute: typeof MerchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/event': {
+      id: '/event'
+      path: '/event'
+      fullPath: '/event'
+      preLoaderRoute: typeof EventRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/brands': {
+      id: '/brands'
+      path: '/brands'
+      fullPath: '/brands'
+      preLoaderRoute: typeof BrandsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/account': {
@@ -105,8 +238,14 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountRoute: AccountRoute,
+  BrandsRoute: BrandsRoute,
+  EventRoute: EventRoute,
   LoginRoute: LoginRoute,
+  MerchRoute: MerchRoute,
+  PlaylistsRoute: PlaylistsRoute,
   SignupRoute: SignupRoute,
+  TeamRoute: TeamRoute,
+  TicketsRoute: TicketsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
