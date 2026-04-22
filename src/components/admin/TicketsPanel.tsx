@@ -101,7 +101,7 @@ function TierCard({
 }
 
 export function TicketsPanel() {
-  const { content, setContent } = useAdminContent();
+  const { content, setContent, saveSection } = useAdminContent();
 
   const updateTier = (i: number, t: TicketTier) =>
     setContent((c) => {
@@ -119,7 +119,12 @@ export function TicketsPanel() {
       tickets: [...c.tickets, { name: "New tier", price: 0, cap: 50, sold: 0, perks: "" }],
     }));
 
-  const save = () => toast.success("Ticket tiers saved.");
+  const save = async () => {
+    try {
+      await saveSection(["tickets", "ticketTagline", "ticketSoldOut"]);
+      toast.success("Ticket tiers saved.");
+    } catch { /* handled */ }
+  };
 
   return (
     <div className="space-y-6">
