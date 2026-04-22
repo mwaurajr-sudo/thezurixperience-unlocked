@@ -376,12 +376,24 @@ export function SiteSettingsPanel() {
 }
 
 /* ─── ACCESS CONTROL ─── */
+type FoundUser = {
+  id: string;
+  email: string;
+  created_at: string;
+  is_admin: boolean;
+};
+
 export function AccessPanel() {
   const { user } = useAuth();
-  const [currentPw, setCurrentPw] = useState("");
   const [newPw, setNewPw] = useState("");
   const [confirmPw, setConfirmPw] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const [query, setQuery] = useState("");
+  const [searching, setSearching] = useState(false);
+  const [results, setResults] = useState<FoundUser[]>([]);
+  const [hasSearched, setHasSearched] = useState(false);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
 
   const handleUpdate = async () => {
     if (!newPw || newPw.length < 8) {
@@ -399,21 +411,140 @@ export function AccessPanel() {
       toast.error(error.message);
     } else {
       toast.success("Password updated successfully.");
-      setCurrentPw("");
       setNewPw("");
       setConfirmPw("");
     }
   };
 
+  const runSearch = async () => {
+    const q = query.trim();
+    if (!q) {
+      toast.error("Enter an email to search.");
+      return;
+    }
+    setSearching(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("No session.");
+      const res = await searchUsers({
+        data: { query: q },
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      setResults(res.users);
+      setHasSearched(true);
+      if (res.users.length === 0) toast.message("No users matched.");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Search failed.");
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  const handleToggle = async (target: FoundUser, makeAdmin: boolean) => {
+    if (!makeAdmin && target.id === user?.id) {
+      toast.error("You can't remove your own admin role.");
+      return;
+    }
+    setTogglingId(target.id);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("No session.");
+      await toggleAdminRole({
+        data: { userId: target.id, makeAdmin },
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      setResults((prev) =>
+        prev.map((u) => (u.id === target.id ? { ...u, is_admin: makeAdmin } : u)),
+      );
+      toast.success(makeAdmin ? `Granted admin to ${target.email}` : `Revoked admin from ${target.email}`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Update failed.");
+    } finally {
+      setTogglingId(null);
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <PanelHeader title="Access Control" description="Manage superuser credentials and session." />
-      <SectionCard title="Superuser account">
+      <PanelHeader title="Access Control" description="Manage admins and superuser credentials." />
+
+      <SectionCard title="Admins">
+        <p className="text-xs text-muted-foreground -mt-1 mb-1">
+          Search any registered user by email and toggle their admin role.
+        </p>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter") runSearch(); }}
+            placeholder="email@example.com"
+            className="flex-1"
+          />
+          <Button
+            onClick={runSearch}
+            disabled={searching}
+            className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
+          >
+            {searching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+            <span className="ml-2">Search</span>
+          </Button>
+        </div>
+
+        {hasSearched && results.length > 0 && (
+          <div className="mt-4 space-y-2">
+            {results.map((u) => {
+              const isSelf = u.id === user?.id;
+              const isToggling = togglingId === u.id;
+              return (
+                <div
+                  key={u.id}
+                  className="flex flex-col gap-3 rounded-xl border border-border/60 bg-card/50 p-4 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="truncate font-medium">{u.email}</span>
+                      {u.is_admin && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-primary/15 px-2 py-0.5 text-[10px] uppercase tracking-[0.15em] text-primary">
+                          <ShieldCheck className="h-3 w-3" /> Admin
+                        </span>
+                      )}
+                      {isSelf && (
+                        <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
+                          You
+                        </span>
+                      )}
+                    </div>
+                    <div className="mt-1 text-xs text-muted-foreground">
+                      Joined {new Date(u.created_at).toLocaleDateString()}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    {isToggling ? (
+                      <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                    ) : (
+                      <ShieldOff className={`h-4 w-4 ${u.is_admin ? "text-muted-foreground" : "text-foreground/60"}`} />
+                    )}
+                    <Switch
+                      checked={u.is_admin}
+                      disabled={isToggling || (isSelf && u.is_admin)}
+                      onCheckedChange={(v) => handleToggle(u, v)}
+                      aria-label={`Toggle admin for ${u.email}`}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </SectionCard>
+
+      <SectionCard title="Your account">
         <div className="rounded-lg border border-border/60 bg-card p-4 text-sm">
           <span className="text-muted-foreground">Logged in as </span>
           <span className="font-medium">{user?.email}</span>
         </div>
       </SectionCard>
+
       <SectionCard title="Change password">
         <TextField
           label="New password"
