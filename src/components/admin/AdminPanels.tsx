@@ -11,9 +11,12 @@ import {
   TwoCol,
 } from "@/components/admin/AdminFields";
 import { Button } from "@/components/ui/button";
-import { Pencil, ChevronDown, ChevronUp, Trash2, Plus } from "lucide-react";
+import { ChevronDown, ChevronUp, Trash2, Plus, Search, ShieldCheck, ShieldOff, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { searchUsers, toggleAdminRole } from "@/server/admin-users";
+import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
 
 /* ─── MERCH ─── */
 export function MerchPanel() {
