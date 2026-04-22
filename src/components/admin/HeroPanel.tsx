@@ -4,10 +4,15 @@ import { PanelHeader, SectionCard, TextField, TextAreaField, TwoCol } from "@/co
 import { Button } from "@/components/ui/button";
 
 export function HeroPanel() {
-  const { content, setContent } = useAdminContent();
+  const { content, setContent, saveSection } = useAdminContent();
   const { hero, manifesto } = content;
 
-  const save = () => toast.success("Hero & Manifesto saved.");
+  const save = async () => {
+    try {
+      await saveSection(["hero", "manifesto"]);
+      toast.success("Hero & Manifesto saved.");
+    } catch { /* error toast handled in context */ }
+  };
 
   return (
     <div className="space-y-6">

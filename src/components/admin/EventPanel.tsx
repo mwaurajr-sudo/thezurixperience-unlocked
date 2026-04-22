@@ -12,13 +12,18 @@ import {
 import { Button } from "@/components/ui/button";
 
 export function EventPanel() {
-  const { content, setContent } = useAdminContent();
+  const { content, setContent, saveSection } = useAdminContent();
   const { event } = content;
 
   const set = (patch: Partial<typeof event>) =>
     setContent((c) => ({ ...c, event: { ...c.event, ...patch } }));
 
-  const save = () => toast.success("Event details saved.");
+  const save = async () => {
+    try {
+      await saveSection("event");
+      toast.success("Event details saved.");
+    } catch { /* handled */ }
+  };
 
   return (
     <div className="space-y-6">
