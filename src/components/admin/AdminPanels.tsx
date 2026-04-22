@@ -17,8 +17,12 @@ import { useAuth } from "@/contexts/AuthContext";
 
 /* ─── MERCH ─── */
 export function MerchPanel() {
-  const { content, setContent } = useAdminContent();
+  const { content, setContent, saveSection } = useAdminContent();
   const [open, setOpen] = useState<number | null>(null);
+
+  const save = async () => {
+    try { await saveSection("merch"); toast.success("Merch saved."); } catch { /* handled */ }
+  };
 
   const updateItem = (i: number, patch: Partial<(typeof content.merch)[0]>) =>
     setContent((c) => {
@@ -87,7 +91,7 @@ export function MerchPanel() {
           <Plus className="mr-1 h-3.5 w-3.5" /> Add item
         </Button>
       </SectionCard>
-      <Button className="rounded-full bg-primary px-8 text-primary-foreground hover:bg-primary/90" onClick={() => toast.success("Merch saved.")}>
+      <Button className="rounded-full bg-primary px-8 text-primary-foreground hover:bg-primary/90" onClick={save}>
         Save changes
       </Button>
     </div>
@@ -96,8 +100,12 @@ export function MerchPanel() {
 
 /* ─── PLAYLISTS ─── */
 export function PlaylistsPanel() {
-  const { content, setContent } = useAdminContent();
+  const { content, setContent, saveSection } = useAdminContent();
   const [open, setOpen] = useState<number | null>(0);
+
+  const save = async () => {
+    try { await saveSection("playlists"); toast.success("Playlists saved."); } catch { /* handled */ }
+  };
 
   const update = (i: number, patch: Partial<(typeof content.playlists)[0]>) =>
     setContent((c) => {
@@ -163,7 +171,7 @@ export function PlaylistsPanel() {
           <Plus className="mr-1 h-3.5 w-3.5" /> Add playlist
         </Button>
       </SectionCard>
-      <Button className="rounded-full bg-primary px-8 text-primary-foreground hover:bg-primary/90" onClick={() => toast.success("Playlists saved.")}>
+      <Button className="rounded-full bg-primary px-8 text-primary-foreground hover:bg-primary/90" onClick={save}>
         Save changes
       </Button>
     </div>
@@ -172,8 +180,12 @@ export function PlaylistsPanel() {
 
 /* ─── BRANDS ─── */
 export function BrandsPanel() {
-  const { content, setContent } = useAdminContent();
+  const { content, setContent, saveSection } = useAdminContent();
   const [open, setOpen] = useState<number | null>(null);
+
+  const save = async () => {
+    try { await saveSection("brands"); toast.success("Brand partners saved."); } catch { /* handled */ }
+  };
 
   const update = (i: number, patch: Partial<(typeof content.brands)[0]>) =>
     setContent((c) => {
@@ -229,7 +241,7 @@ export function BrandsPanel() {
           <Plus className="mr-1 h-3.5 w-3.5" /> Add partner
         </Button>
       </SectionCard>
-      <Button className="rounded-full bg-primary px-8 text-primary-foreground hover:bg-primary/90" onClick={() => toast.success("Brand partners saved.")}>
+      <Button className="rounded-full bg-primary px-8 text-primary-foreground hover:bg-primary/90" onClick={save}>
         Save changes
       </Button>
     </div>
@@ -238,8 +250,12 @@ export function BrandsPanel() {
 
 /* ─── TEAM ─── */
 export function TeamPanel() {
-  const { content, setContent } = useAdminContent();
+  const { content, setContent, saveSection } = useAdminContent();
   const [open, setOpen] = useState<number | null>(null);
+
+  const save = async () => {
+    try { await saveSection("team"); toast.success("Team saved."); } catch { /* handled */ }
+  };
 
   const update = (i: number, patch: Partial<(typeof content.team)[0]>) =>
     setContent((c) => {
@@ -299,7 +315,7 @@ export function TeamPanel() {
           <Plus className="mr-1 h-3.5 w-3.5" /> Add member
         </Button>
       </SectionCard>
-      <Button className="rounded-full bg-primary px-8 text-primary-foreground hover:bg-primary/90" onClick={() => toast.success("Team saved.")}>
+      <Button className="rounded-full bg-primary px-8 text-primary-foreground hover:bg-primary/90" onClick={save}>
         Save changes
       </Button>
     </div>
@@ -308,9 +324,13 @@ export function TeamPanel() {
 
 /* ─── SITE SETTINGS ─── */
 export function SiteSettingsPanel() {
-  const { content, setContent } = useAdminContent();
+  const { content, setContent, saveSection } = useAdminContent();
   const { site } = content;
   const set = (patch: Partial<typeof site>) => setContent((c) => ({ ...c, site: { ...c.site, ...patch } }));
+
+  const save = async () => {
+    try { await saveSection("site"); toast.success("Site settings saved."); } catch { /* handled */ }
+  };
 
   return (
     <div className="space-y-6">
@@ -345,7 +365,7 @@ export function SiteSettingsPanel() {
         <TextField label="Meta title" value={site.metaTitle} onChange={(v) => set({ metaTitle: v })} />
         <TextAreaField label="Meta description" value={site.metaDesc} onChange={(v) => set({ metaDesc: v })} rows={3} />
       </SectionCard>
-      <Button className="rounded-full bg-primary px-8 text-primary-foreground hover:bg-primary/90" onClick={() => toast.success("Site settings saved.")}>
+      <Button className="rounded-full bg-primary px-8 text-primary-foreground hover:bg-primary/90" onClick={save}>
         Save changes
       </Button>
     </div>
