@@ -218,7 +218,8 @@ export function AdminContentProvider({ children }: { children: ReactNode }) {
     const sections = Array.isArray(section) ? section : [section];
     const rows = sections.map((s) => ({
       section: s as string,
-      data: content[s] as unknown as Record<string, unknown>,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      data: content[s] as any,
     }));
     const { error } = await supabase
       .from("site_content")
