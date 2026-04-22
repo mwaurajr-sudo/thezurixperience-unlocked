@@ -1,4 +1,6 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export interface EventDetails {
   vol: string;
@@ -165,17 +167,71 @@ const defaultContent: SiteContent = {
   },
 };
 
+type SectionKey = keyof SiteContent;
+
 interface AdminContentContextValue {
   content: SiteContent;
   setContent: React.Dispatch<React.SetStateAction<SiteContent>>;
+  loading: boolean;
+  saveSection: (section: SectionKey | SectionKey[]) => Promise<void>;
 }
 
 const AdminContentContext = createContext<AdminContentContextValue | undefined>(undefined);
 
 export function AdminContentProvider({ children }: { children: ReactNode }) {
   const [content, setContent] = useState<SiteContent>(defaultContent);
+  const [loading, setLoading] = useState(true);
+
+  // Load all sections from DB on mount
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase.from("site_content").select("section, data");
+      if (cancelled) return;
+      if (error) {
+        console.error("Failed to load site content", error);
+        toast.error("Could not load saved content; showing defaults.");
+        setLoading(false);
+        return;
+      }
+      if (data && data.length > 0) {
+        setContent((prev) => {
+          const next = { ...prev } as SiteContent;
+          for (const row of data) {
+            const key = row.section as SectionKey;
+            if (key in next && row.data != null) {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              (next as any)[key] = row.data;
+            }
+          }
+          return next;
+        });
+      }
+      setLoading(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const saveSection = async (section: SectionKey | SectionKey[]) => {
+    const sections = Array.isArray(section) ? section : [section];
+    const rows = sections.map((s) => ({
+      section: s as string,
+      data: content[s] as unknown as Record<string, unknown>,
+    }));
+    const { error } = await supabase
+      .from("site_content")
+      .upsert(rows, { onConflict: "section" });
+    if (error) {
+      console.error("Save failed", error);
+      toast.error(`Save failed: ${error.message}`);
+      throw error;
+    }
+  };
+
   return (
-    <AdminContentContext.Provider value={{ content, setContent }}>
+    <AdminContentContext.Provider value={{ content, setContent, loading, saveSection }}>
       {children}
     </AdminContentContext.Provider>
   );
