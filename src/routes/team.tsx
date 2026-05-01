@@ -22,26 +22,41 @@ export const Route = createFileRoute("/team")({
 function TeamPage() {
   return (
     <GatedPageLayout
+      index="06"
       eyebrow="The curators"
-      title={<>Meet the <span className="italic text-primary">room</span></>}
+      title={<>Meet the <em className="italic text-primary-glow">room</em></>}
       description="Reach out directly. We respond — slowly, intentionally."
     >
-      <div className="grid gap-px overflow-hidden rounded-2xl border border-border/60 bg-border/40 sm:grid-cols-2">
-        {team.map((m) => (
-          <div key={m.email} className="bg-card p-8">
-            <div className="text-xs uppercase tracking-[0.2em] text-primary">{m.role}</div>
-            <div className="font-display mt-2 text-2xl font-bold">{m.name}</div>
-            <div className="mt-4 space-y-2 text-sm text-muted-foreground">
-              <a href={`mailto:${m.email}`} className="flex items-center gap-2 hover:text-foreground">
-                <Mail className="h-4 w-4 text-primary" /> {m.email}
-              </a>
-              <a href={`tel:${m.phone.replace(/\s/g, "")}`} className="flex items-center gap-2 hover:text-foreground">
-                <Phone className="h-4 w-4 text-primary" /> {m.phone}
-              </a>
-            </div>
-          </div>
-        ))}
+      <div className="grid grid-cols-1 divide-y divide-border/60 border border-border/60 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
+        {team.slice(0, 2).map((m, i) => <Person key={m.email} {...m} index={i + 1} />)}
+      </div>
+      <div className="grid grid-cols-1 divide-y divide-border/60 border border-border/60 border-t-0 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
+        {team.slice(2).map((m, i) => <Person key={m.email} {...m} index={i + 3} />)}
       </div>
     </GatedPageLayout>
+  );
+}
+
+function Person({ name, role, email, phone, index }: { name: string; role: string; email: string; phone: string; index: number }) {
+  return (
+    <div className="bg-background p-8 transition-colors hover:bg-card sm:p-10">
+      <div className="flex items-start justify-between">
+        <div className="font-mono text-[10px] uppercase tracking-[0.35em] text-primary-glow">
+          {role}
+        </div>
+        <div className="font-mono text-[10px] uppercase tracking-[0.35em] text-muted-foreground">
+          / 0{index}
+        </div>
+      </div>
+      <div className="font-display mt-4 text-3xl font-light italic sm:text-4xl">{name}</div>
+      <div className="mt-6 space-y-3 text-sm text-muted-foreground">
+        <a href={`mailto:${email}`} className="flex items-center gap-3 transition-colors hover:text-foreground">
+          <Mail className="h-4 w-4 text-primary-glow" /> {email}
+        </a>
+        <a href={`tel:${phone.replace(/\s/g, "")}`} className="flex items-center gap-3 transition-colors hover:text-foreground">
+          <Phone className="h-4 w-4 text-primary-glow" /> {phone}
+        </a>
+      </div>
+    </div>
   );
 }
