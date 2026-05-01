@@ -68,24 +68,43 @@ function TicketsPage() {
 
   return (
     <GatedPageLayout
+      index="02"
       eyebrow="Reserve"
-      title={<>Pick your <span className="italic text-primary">entry</span></>}
+      title={<>Pick your <em className="italic text-primary-glow">entry</em></>}
       description="Capacity is intentionally small. Once a tier is gone, it's gone."
     >
-      <div className="grid gap-5 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {tiers.map((t) => (
+      <div className="grid grid-cols-1 divide-y divide-border/60 border border-border/60 md:grid-cols-3 md:divide-x md:divide-y-0">
+        {tiers.map((t, i) => (
           <div
             key={t.name}
-            className={`rounded-2xl border p-6 sm:p-8 ${t.featured ? "border-primary bg-primary/5" : "border-border/60 bg-card/40"}`}
+            className={`relative flex flex-col bg-background p-8 transition-colors hover:bg-card sm:p-10 ${
+              t.featured ? "lg:bg-card" : ""
+            }`}
           >
-            <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{t.name}</div>
-            <div className="font-display mt-3 text-3xl font-bold sm:text-4xl">{t.price}</div>
-            <ul className="mt-6 space-y-2 text-sm text-muted-foreground">
-              {t.perks.map((p) => <li key={p}>· {p}</li>)}
+            {t.featured && (
+              <div className="absolute right-4 top-4 border border-primary/50 bg-primary/10 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.3em] text-primary-glow">
+                Most chosen
+              </div>
+            )}
+            <div className="font-mono text-[10px] uppercase tracking-[0.4em] text-muted-foreground">
+              / 0{i + 1} — {t.name}
+            </div>
+            <div className="font-display mt-6 text-4xl font-light italic text-foreground sm:text-5xl">
+              {t.price}
+            </div>
+            <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.3em] text-primary-glow">
+              per guest
+            </div>
+            <ul className="mt-8 flex-1 space-y-3 text-sm text-muted-foreground">
+              {t.perks.map((p) => (
+                <li key={p} className="flex gap-3 border-b border-border/40 pb-3">
+                  <span className="text-primary-glow">—</span> {p}
+                </li>
+              ))}
             </ul>
             <Button
               onClick={() => setActiveTier(t)}
-              className="mt-8 w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
+              className="mt-8 w-full rounded-none bg-primary text-primary-foreground hover:bg-primary-glow"
             >
               Reserve
             </Button>
@@ -231,7 +250,7 @@ function CheckoutDialog({ tier, onClose }: { tier: Tier | null; onClose: () => v
             <Button
               type="submit"
               disabled={loading}
-              className="w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
+              className="w-full rounded-none bg-primary text-primary-foreground hover:bg-primary-glow"
             >
               {loading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />

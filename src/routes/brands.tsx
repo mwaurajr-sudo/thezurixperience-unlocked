@@ -23,15 +23,25 @@ export const Route = createFileRoute("/brands")({
 function BrandsPage() {
   return (
     <GatedPageLayout
+      index="05"
       eyebrow="The collaborators"
-      title={<>The labels <span className="italic text-primary">behind</span> the night</>}
+      title={<>The labels <em className="italic text-primary-glow">behind</em> the night</>}
       description="Every Xperience is co-created. These are the houses we trust."
     >
-      <div className="grid gap-px overflow-hidden rounded-2xl border border-border/60 bg-border/40 sm:grid-cols-2 lg:grid-cols-3">
-        {brands.map((b) => (
-          <div key={b.name} className="flex h-40 flex-col justify-between bg-card p-6">
-            <div className="text-xs uppercase tracking-[0.2em] text-primary">{b.role}</div>
-            <div className="font-display text-3xl font-bold">{b.name}</div>
+      <div className="grid grid-cols-1 divide-y divide-border/60 border border-border/60 sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-3">
+        {brands.map((b, i) => (
+          <div key={b.name} className="group flex h-48 flex-col justify-between bg-background p-7 transition-colors hover:bg-card">
+            <div className="flex items-start justify-between">
+              <div className="font-mono text-[10px] uppercase tracking-[0.35em] text-primary-glow">
+                {b.role}
+              </div>
+              <div className="font-mono text-[10px] uppercase tracking-[0.35em] text-muted-foreground">
+                / 0{i + 1}
+              </div>
+            </div>
+            <div className="font-display text-3xl font-light italic leading-none tracking-tight sm:text-4xl">
+              {b.name}
+            </div>
           </div>
         ))}
       </div>

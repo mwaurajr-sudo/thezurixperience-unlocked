@@ -76,36 +76,37 @@ function AccountPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="relative min-h-screen overflow-hidden bg-background text-foreground">
+      <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[60vh] spotlight opacity-50" />
       <SiteHeader />
-      <main className="mx-auto max-w-3xl px-6 pb-24 pt-32">
-        <p className="text-xs uppercase tracking-[0.3em] text-primary">— Your profile</p>
-        <h1 className="font-display mt-4 text-5xl font-bold tracking-tight">
-          Hello, <span className="italic text-primary">{displayName || "member"}</span>
+      <main className="mx-auto max-w-3xl px-5 pb-32 pt-32 sm:px-8 sm:pt-40">
+        <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-primary-glow">— Your profile</p>
+        <h1 className="font-display mt-6 text-5xl font-light leading-[0.95] tracking-tight sm:text-6xl">
+          Hello, <em className="italic text-primary-glow">{displayName || "member"}</em>
         </h1>
-        <p className="mt-3 text-sm text-muted-foreground">{user?.email}</p>
+        <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">{user?.email}</p>
 
         {loading ? (
-          <div className="mt-12 flex justify-center"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+          <div className="mt-12 flex justify-center"><Loader2 className="h-6 w-6 animate-spin text-primary-glow" /></div>
         ) : (
-          <div className="mt-12 space-y-6 rounded-2xl border border-border/60 bg-card/40 p-8">
+          <div className="mt-12 space-y-6 border border-border/60 bg-card/40 p-8 backdrop-blur sm:p-10">
             <div>
-              <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Display name</Label>
-              <Input value={displayName} onChange={(e) => setDisplayName(e.target.value)} maxLength={60} className="mt-2" />
+              <Label className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">Display name</Label>
+              <Input value={displayName} onChange={(e) => setDisplayName(e.target.value)} maxLength={60} className="mt-2 rounded-none" />
             </div>
             <div>
-              <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Avatar URL</Label>
-              <Input value={avatarUrl} onChange={(e) => setAvatarUrl(e.target.value)} placeholder="https://…" className="mt-2" />
+              <Label className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">Avatar URL</Label>
+              <Input value={avatarUrl} onChange={(e) => setAvatarUrl(e.target.value)} placeholder="https://…" className="mt-2 rounded-none" />
             </div>
             <div>
-              <Label className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Bio</Label>
-              <Textarea value={bio} onChange={(e) => setBio(e.target.value)} maxLength={280} rows={3} className="mt-2" />
+              <Label className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">Bio</Label>
+              <Textarea value={bio} onChange={(e) => setBio(e.target.value)} maxLength={280} rows={3} className="mt-2 rounded-none" />
             </div>
             <div className="flex flex-wrap gap-3 pt-2">
-              <Button onClick={onSave} disabled={saving} className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
+              <Button onClick={onSave} disabled={saving} className="rounded-none bg-primary text-primary-foreground hover:bg-primary-glow">
                 {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save changes"}
               </Button>
-              <Button onClick={onSignOut} variant="outline" className="rounded-full border-foreground/20 bg-transparent">
+              <Button onClick={onSignOut} variant="outline" className="rounded-none border-foreground/20 bg-transparent">
                 Sign out
               </Button>
             </div>

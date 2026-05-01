@@ -59,41 +59,46 @@ function LoginPage() {
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-background px-6 py-24">
-      <div className="absolute inset-0 -z-10 bg-gradient-to-br from-primary/15 via-background to-background" />
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-5 py-24 sm:px-8">
+      <div className="absolute inset-0 -z-10 spotlight opacity-60" />
+      <div className="absolute inset-x-0 top-0 -z-10 h-[1px] bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
       <div className="w-full max-w-md">
-        <Link to="/" className="font-display block text-center text-2xl font-bold tracking-tight">
-          <span className="text-primary">Zuri</span>Xperience
+        <Link to="/" className="font-display block text-center text-3xl font-light italic tracking-tight">
+          <span className="text-primary-glow">Zuri</span>Xperience
         </Link>
-        <div className="mt-12 rounded-2xl border border-border/60 bg-card/60 p-8 backdrop-blur">
-          <h1 className="font-display text-3xl font-bold">Welcome back</h1>
+        <p className="mt-4 text-center font-mono text-[10px] uppercase tracking-[0.4em] text-muted-foreground">
+          — Members entrance
+        </p>
+
+        <div className="mt-12 border border-border/60 bg-card/60 p-8 backdrop-blur sm:p-10">
+          <h1 className="font-display text-4xl font-light italic">Welcome back</h1>
           <p className="mt-2 text-sm text-muted-foreground">Sign in to unlock the room.</p>
 
-          <Button onClick={onGoogle} variant="outline" className="mt-8 w-full rounded-full border-foreground/20 bg-transparent">
+          <Button onClick={onGoogle} variant="outline" className="mt-8 w-full rounded-none border-foreground/20 bg-transparent hover:bg-foreground/5">
             <GoogleIcon /> Continue with Google
           </Button>
 
-          <div className="my-6 flex items-center gap-3 text-xs uppercase tracking-[0.2em] text-muted-foreground">
+          <div className="my-6 flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
             <div className="h-px flex-1 bg-border" /> Or <div className="h-px flex-1 bg-border" />
           </div>
 
           <form onSubmit={onSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="email" className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Email</Label>
-              <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="mt-2" />
+              <Label htmlFor="email" className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">Email</Label>
+              <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="mt-2 rounded-none" />
             </div>
             <div>
-              <Label htmlFor="password" className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Password</Label>
-              <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} className="mt-2" />
+              <Label htmlFor="password" className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">Password</Label>
+              <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} className="mt-2 rounded-none" />
             </div>
-            <Button type="submit" disabled={loading} className="w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
+            <Button type="submit" disabled={loading} className="w-full rounded-none bg-primary text-primary-foreground hover:bg-primary-glow">
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Sign in"}
             </Button>
           </form>
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
             New here?{" "}
-            <Link to="/signup" className="text-primary hover:underline">Create an account</Link>
+            <Link to="/signup" className="text-primary-glow hover:underline">Request access</Link>
           </p>
         </div>
       </div>

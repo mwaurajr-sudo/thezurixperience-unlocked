@@ -22,21 +22,37 @@ const facts = [
 function EventPage() {
   return (
     <GatedPageLayout
+      index="01"
       eyebrow="Vol. 01 — RnB"
-      title={<>RnB Nights<br /><span className="italic text-primary">Vol. 01</span></>}
+      title={<>RnB Nights<br /><em className="italic text-primary-glow">Vol. 01</em></>}
       description="Slow burn. Deep red. A night curated around rhythm, intimacy, and ritual. Lineup revealed at the door."
     >
-      <div className="grid gap-px overflow-hidden rounded-2xl border border-border/60 bg-border/40 sm:grid-cols-2">
-        {facts.map((f) => (
-          <div key={f.label} className="flex items-start gap-4 bg-card p-8">
-            <f.icon className="h-6 w-6 text-primary" />
-            <div>
-              <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{f.label}</div>
-              <div className="font-display mt-2 text-2xl font-bold">{f.value}</div>
-            </div>
-          </div>
+      <div className="grid grid-cols-1 divide-y divide-border/60 border border-border/60 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
+        {facts.slice(0, 2).map((f) => (
+          <FactCell key={f.label} {...f} />
+        ))}
+      </div>
+      <div className="grid grid-cols-1 divide-y divide-border/60 border border-border/60 border-t-0 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
+        {facts.slice(2).map((f) => (
+          <FactCell key={f.label} {...f} />
         ))}
       </div>
     </GatedPageLayout>
+  );
+}
+
+function FactCell({ icon: Icon, label, value }: { icon: typeof CalendarDays; label: string; value: string }) {
+  return (
+    <div className="flex items-start gap-5 p-8 sm:p-10">
+      <Icon className="mt-1 h-5 w-5 text-primary-glow" />
+      <div>
+        <div className="font-mono text-[10px] uppercase tracking-[0.35em] text-muted-foreground">
+          {label}
+        </div>
+        <div className="font-display mt-3 text-3xl font-light italic text-foreground sm:text-4xl">
+          {value}
+        </div>
+      </div>
+    </div>
   );
 }
