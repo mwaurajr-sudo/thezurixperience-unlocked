@@ -9,46 +9,15 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TicketsRouteImport } from './routes/tickets'
-import { Route as TeamRouteImport } from './routes/team'
-import { Route as SignupRouteImport } from './routes/signup'
-import { Route as PlaylistsRouteImport } from './routes/playlists'
-import { Route as MerchRouteImport } from './routes/merch'
-import { Route as LoginRouteImport } from './routes/login'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as EventRouteImport } from './routes/event'
-import { Route as BrandsRouteImport } from './routes/brands'
 import { Route as AdminRouteImport } from './routes/admin'
-import { Route as AccountRouteImport } from './routes/account'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 
-const TicketsRoute = TicketsRouteImport.update({
-  id: '/tickets',
-  path: '/tickets',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TeamRoute = TeamRouteImport.update({
-  id: '/team',
-  path: '/team',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SignupRoute = SignupRouteImport.update({
-  id: '/signup',
-  path: '/signup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PlaylistsRoute = PlaylistsRouteImport.update({
-  id: '/playlists',
-  path: '/playlists',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MerchRoute = MerchRouteImport.update({
-  id: '/merch',
-  path: '/merch',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EventRoute = EventRouteImport.update({
@@ -56,19 +25,14 @@ const EventRoute = EventRouteImport.update({
   path: '/event',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BrandsRoute = BrandsRouteImport.update({
-  id: '/brands',
-  path: '/brands',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AccountRoute = AccountRouteImport.update({
-  id: '/account',
-  path: '/account',
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -79,142 +43,49 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/account': typeof AccountRoute
+  '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
-  '/brands': typeof BrandsRoute
   '/event': typeof EventRoute
-  '/login': typeof LoginRoute
-  '/merch': typeof MerchRoute
-  '/playlists': typeof PlaylistsRoute
-  '/signup': typeof SignupRoute
-  '/team': typeof TeamRoute
-  '/tickets': typeof TicketsRoute
+  '/settings': typeof SettingsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/account': typeof AccountRoute
+  '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
-  '/brands': typeof BrandsRoute
   '/event': typeof EventRoute
-  '/login': typeof LoginRoute
-  '/merch': typeof MerchRoute
-  '/playlists': typeof PlaylistsRoute
-  '/signup': typeof SignupRoute
-  '/team': typeof TeamRoute
-  '/tickets': typeof TicketsRoute
+  '/settings': typeof SettingsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/account': typeof AccountRoute
+  '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
-  '/brands': typeof BrandsRoute
   '/event': typeof EventRoute
-  '/login': typeof LoginRoute
-  '/merch': typeof MerchRoute
-  '/playlists': typeof PlaylistsRoute
-  '/signup': typeof SignupRoute
-  '/team': typeof TeamRoute
-  '/tickets': typeof TicketsRoute
+  '/settings': typeof SettingsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/account'
-    | '/admin'
-    | '/brands'
-    | '/event'
-    | '/login'
-    | '/merch'
-    | '/playlists'
-    | '/signup'
-    | '/team'
-    | '/tickets'
+  fullPaths: '/' | '/about' | '/admin' | '/event' | '/settings'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/account'
-    | '/admin'
-    | '/brands'
-    | '/event'
-    | '/login'
-    | '/merch'
-    | '/playlists'
-    | '/signup'
-    | '/team'
-    | '/tickets'
-  id:
-    | '__root__'
-    | '/'
-    | '/account'
-    | '/admin'
-    | '/brands'
-    | '/event'
-    | '/login'
-    | '/merch'
-    | '/playlists'
-    | '/signup'
-    | '/team'
-    | '/tickets'
+  to: '/' | '/about' | '/admin' | '/event' | '/settings'
+  id: '__root__' | '/' | '/about' | '/admin' | '/event' | '/settings'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AccountRoute: typeof AccountRoute
+  AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRoute
-  BrandsRoute: typeof BrandsRoute
   EventRoute: typeof EventRoute
-  LoginRoute: typeof LoginRoute
-  MerchRoute: typeof MerchRoute
-  PlaylistsRoute: typeof PlaylistsRoute
-  SignupRoute: typeof SignupRoute
-  TeamRoute: typeof TeamRoute
-  TicketsRoute: typeof TicketsRoute
+  SettingsRoute: typeof SettingsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/tickets': {
-      id: '/tickets'
-      path: '/tickets'
-      fullPath: '/tickets'
-      preLoaderRoute: typeof TicketsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/team': {
-      id: '/team'
-      path: '/team'
-      fullPath: '/team'
-      preLoaderRoute: typeof TeamRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/signup': {
-      id: '/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof SignupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/playlists': {
-      id: '/playlists'
-      path: '/playlists'
-      fullPath: '/playlists'
-      preLoaderRoute: typeof PlaylistsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/merch': {
-      id: '/merch'
-      path: '/merch'
-      fullPath: '/merch'
-      preLoaderRoute: typeof MerchRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/event': {
@@ -224,13 +95,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/brands': {
-      id: '/brands'
-      path: '/brands'
-      fullPath: '/brands'
-      preLoaderRoute: typeof BrandsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/admin': {
       id: '/admin'
       path: '/admin'
@@ -238,11 +102,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/account': {
-      id: '/account'
-      path: '/account'
-      fullPath: '/account'
-      preLoaderRoute: typeof AccountRouteImport
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -257,26 +121,11 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AccountRoute: AccountRoute,
+  AboutRoute: AboutRoute,
   AdminRoute: AdminRoute,
-  BrandsRoute: BrandsRoute,
   EventRoute: EventRoute,
-  LoginRoute: LoginRoute,
-  MerchRoute: MerchRoute,
-  PlaylistsRoute: PlaylistsRoute,
-  SignupRoute: SignupRoute,
-  TeamRoute: TeamRoute,
-  TicketsRoute: TicketsRoute,
+  SettingsRoute: SettingsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

@@ -13,7 +13,7 @@ export function AdminGate({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!loading && !user) {
-      navigate({ to: "/login" });
+      navigate({ to: "/" });
       return;
     }
     if (!loading && user) {
