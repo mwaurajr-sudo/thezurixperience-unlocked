@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AuthGate } from "@/components/AuthGate";
-import { GatedPageLayout } from "@/components/GatedPageLayout";
-import { CalendarDays, MapPin, Clock, Shirt } from "lucide-react";
+import { SiteHeader } from "@/components/SiteHeader";
 
 export const Route = createFileRoute("/event")({
   component: () => (
@@ -9,50 +8,43 @@ export const Route = createFileRoute("/event")({
       <EventPage />
     </AuthGate>
   ),
-  head: () => ({ meta: [{ title: "RnB Nights Vol. 01 — TheZuriXperience" }] }),
+  head: () => ({ meta: [{ title: "Event — TheZuriXperience" }] }),
 });
 
 const facts = [
-  { icon: CalendarDays, label: "Date", value: "Saturday, December 14" },
-  { icon: Clock, label: "Doors", value: "9:00 PM — 4:00 AM" },
-  { icon: MapPin, label: "Location", value: "Disclosed at door · Nairobi" },
-  { icon: Shirt, label: "Dress", value: "Wine, black, or both" },
+  ["Date", "Saturday, December 14"],
+  ["Doors", "9:00 PM — 4:00 AM"],
+  ["Location", "Disclosed at door · Nairobi"],
+  ["Dress", "Wine, black, or both"],
 ];
 
 function EventPage() {
   return (
-    <GatedPageLayout
-      index="01"
-      eyebrow="Vol. 01 — RnB"
-      title={<>RnB Nights<br /><em className="italic text-primary-glow">Vol. 01</em></>}
-      description="Slow burn. Deep red. A night curated around rhythm, intimacy, and ritual. Lineup revealed at the door."
-    >
-      <div className="grid grid-cols-1 divide-y divide-border/60 border border-border/60 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
-        {facts.slice(0, 2).map((f) => (
-          <FactCell key={f.label} {...f} />
-        ))}
-      </div>
-      <div className="grid grid-cols-1 divide-y divide-border/60 border border-border/60 border-t-0 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
-        {facts.slice(2).map((f) => (
-          <FactCell key={f.label} {...f} />
-        ))}
-      </div>
-    </GatedPageLayout>
-  );
-}
+    <div className="min-h-screen bg-black text-primary">
+      <SiteHeader />
+      <main className="mx-auto max-w-3xl px-5 py-16">
+        <h1 className="font-mono text-2xl uppercase tracking-[0.3em]">
+          &gt; Event<span className="animate-blink">_</span>
+        </h1>
 
-function FactCell({ icon: Icon, label, value }: { icon: typeof CalendarDays; label: string; value: string }) {
-  return (
-    <div className="flex items-start gap-5 p-8 sm:p-10">
-      <Icon className="mt-1 h-5 w-5 text-primary-glow" />
-      <div>
-        <div className="font-mono text-[10px] uppercase tracking-[0.35em] text-muted-foreground">
-          {label}
+        <div className="mt-10 font-mono">
+          <p className="text-xs uppercase tracking-[0.4em] text-primary/60">Vol. 01</p>
+          <h2 className="mt-3 text-3xl uppercase tracking-[0.15em]">RnB Nights</h2>
+          <p className="mt-6 max-w-prose text-base leading-relaxed text-primary/80">
+            Slow burn. Deep red. A night curated around rhythm, intimacy, and ritual.
+            Lineup revealed at the door.
+          </p>
         </div>
-        <div className="font-display mt-3 text-3xl font-light italic text-foreground sm:text-4xl">
-          {value}
-        </div>
-      </div>
+
+        <dl className="mt-12 divide-y divide-primary/20 border-y border-primary/20 font-mono">
+          {facts.map(([k, v]) => (
+            <div key={k} className="grid grid-cols-3 gap-4 py-4">
+              <dt className="text-xs uppercase tracking-[0.3em] text-primary/60">{k}</dt>
+              <dd className="col-span-2 text-base text-primary">{v}</dd>
+            </div>
+          ))}
+        </dl>
+      </main>
     </div>
   );
 }
