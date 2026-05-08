@@ -6,6 +6,9 @@ const links = [
   { label: "About", to: "/about" as const },
   { label: "Event", to: "/event" as const },
   { label: "Tickets", to: "/tickets" as const },
+  { label: "Payment", to: "/payment" as const },
+  { label: "Playlist", to: "/playlist" as const },
+  { label: "Recordings", to: "/recordings" as const },
   { label: "Settings", to: "/settings" as const },
 ];
 
@@ -20,14 +23,14 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-primary/30 bg-black">
-      <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-4">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-4">
         <Link to="/about" className="flex items-center gap-2">
           <img src={logo} alt="ZX" className="h-8 w-8" />
           <span className="font-mono text-sm uppercase tracking-[0.25em] text-primary">
             TheZuriXperience
           </span>
         </Link>
-        <nav className="flex items-center gap-5">
+        <nav className="flex flex-wrap items-center gap-x-5 gap-y-2">
           {links.map((l) => (
             <Link
               key={l.label}

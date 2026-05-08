@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { AuthGate } from "@/components/AuthGate";
@@ -17,8 +17,8 @@ export const Route = createFileRoute("/tickets")({
 function TicketsPage() {
   const { content, loading } = useSiteContent();
   const e = content.event;
+  const navigate = useNavigate();
   const [qty, setQty] = useState<Record<string, number>>({});
-  const [selected, setSelected] = useState<string | null>(null);
 
   const setCount = (name: string, n: number) =>
     setQty((q) => ({ ...q, [name]: Math.max(0, n) }));
@@ -27,10 +27,18 @@ function TicketsPage() {
     const n = qty[tier.name] ?? 1;
     if (n < 1) return toast.error("Pick at least 1 ticket");
     if (n > tier.cap - tier.sold) return toast.error("Not enough left in this tier");
-    setSelected(tier.name);
-    toast.success(
-      `Reserved ${n} × ${tier.name}. We'll email you payment instructions.`,
-    );
+    const reservation = {
+      tier: tier.name,
+      qty: n,
+      unit: tier.price,
+      total: tier.price * n,
+      eventVol: e.vol,
+      eventName: e.name,
+      eventDate: e.date,
+    };
+    sessionStorage.setItem("zuri_reservation", JSON.stringify(reservation));
+    toast.success(`Reserved ${n} × ${tier.name}. Proceed to payment.`);
+    navigate({ to: "/payment" });
   };
 
   return (
@@ -61,15 +69,10 @@ function TicketsPage() {
               const left = t.cap - t.sold;
               const pct = t.cap > 0 ? Math.round((t.sold / t.cap) * 100) : 0;
               const soldOut = left <= 0;
-              const isSelected = selected === t.name;
               return (
                 <div
                   key={t.name}
-                  className={`border bg-black p-5 font-mono transition-colors ${
-                    isSelected
-                      ? "border-primary bg-primary/10"
-                      : "border-primary/30 hover:border-primary/60"
-                  }`}
+                  className="border border-primary/30 bg-black p-5 font-mono hover:border-primary/60"
                 >
                   <div className="flex items-baseline justify-between gap-4">
                     <div>
@@ -94,10 +97,7 @@ function TicketsPage() {
                   )}
 
                   <div className="mt-4 h-1 bg-primary/20">
-                    <div
-                      className="h-1 bg-primary"
-                      style={{ width: `${pct}%` }}
-                    />
+                    <div className="h-1 bg-primary" style={{ width: `${pct}%` }} />
                   </div>
 
                   {!soldOut && (
@@ -123,7 +123,7 @@ function TicketsPage() {
                         onClick={() => reserve(t)}
                         className="flex-1 border border-primary bg-primary px-4 py-2 text-xs uppercase tracking-[0.3em] text-black hover:bg-primary-glow"
                       >
-                        Reserve
+                        Reserve →
                       </button>
                     </div>
                   )}

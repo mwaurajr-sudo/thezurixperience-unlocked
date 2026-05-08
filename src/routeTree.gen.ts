@@ -11,6 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TicketsRouteImport } from './routes/tickets'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as RecordingsRouteImport } from './routes/recordings'
+import { Route as PlaylistRouteImport } from './routes/playlist'
+import { Route as PaymentRouteImport } from './routes/payment'
 import { Route as EventRouteImport } from './routes/event'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
@@ -24,6 +27,21 @@ const TicketsRoute = TicketsRouteImport.update({
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecordingsRoute = RecordingsRouteImport.update({
+  id: '/recordings',
+  path: '/recordings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaylistRoute = PlaylistRouteImport.update({
+  id: '/playlist',
+  path: '/playlist',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaymentRoute = PaymentRouteImport.update({
+  id: '/payment',
+  path: '/payment',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EventRoute = EventRouteImport.update({
@@ -52,6 +70,9 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
   '/event': typeof EventRoute
+  '/payment': typeof PaymentRoute
+  '/playlist': typeof PlaylistRoute
+  '/recordings': typeof RecordingsRoute
   '/settings': typeof SettingsRoute
   '/tickets': typeof TicketsRoute
 }
@@ -60,6 +81,9 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
   '/event': typeof EventRoute
+  '/payment': typeof PaymentRoute
+  '/playlist': typeof PlaylistRoute
+  '/recordings': typeof RecordingsRoute
   '/settings': typeof SettingsRoute
   '/tickets': typeof TicketsRoute
 }
@@ -69,20 +93,44 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
   '/event': typeof EventRoute
+  '/payment': typeof PaymentRoute
+  '/playlist': typeof PlaylistRoute
+  '/recordings': typeof RecordingsRoute
   '/settings': typeof SettingsRoute
   '/tickets': typeof TicketsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/admin' | '/event' | '/settings' | '/tickets'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/admin'
+    | '/event'
+    | '/payment'
+    | '/playlist'
+    | '/recordings'
+    | '/settings'
+    | '/tickets'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/admin' | '/event' | '/settings' | '/tickets'
+  to:
+    | '/'
+    | '/about'
+    | '/admin'
+    | '/event'
+    | '/payment'
+    | '/playlist'
+    | '/recordings'
+    | '/settings'
+    | '/tickets'
   id:
     | '__root__'
     | '/'
     | '/about'
     | '/admin'
     | '/event'
+    | '/payment'
+    | '/playlist'
+    | '/recordings'
     | '/settings'
     | '/tickets'
   fileRoutesById: FileRoutesById
@@ -92,6 +140,9 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRoute
   EventRoute: typeof EventRoute
+  PaymentRoute: typeof PaymentRoute
+  PlaylistRoute: typeof PlaylistRoute
+  RecordingsRoute: typeof RecordingsRoute
   SettingsRoute: typeof SettingsRoute
   TicketsRoute: typeof TicketsRoute
 }
@@ -110,6 +161,27 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recordings': {
+      id: '/recordings'
+      path: '/recordings'
+      fullPath: '/recordings'
+      preLoaderRoute: typeof RecordingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playlist': {
+      id: '/playlist'
+      path: '/playlist'
+      fullPath: '/playlist'
+      preLoaderRoute: typeof PlaylistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payment': {
+      id: '/payment'
+      path: '/payment'
+      fullPath: '/payment'
+      preLoaderRoute: typeof PaymentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/event': {
@@ -148,6 +220,9 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AdminRoute: AdminRoute,
   EventRoute: EventRoute,
+  PaymentRoute: PaymentRoute,
+  PlaylistRoute: PlaylistRoute,
+  RecordingsRoute: RecordingsRoute,
   SettingsRoute: SettingsRoute,
   TicketsRoute: TicketsRoute,
 }

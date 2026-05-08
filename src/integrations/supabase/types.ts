@@ -62,6 +62,48 @@ export type Database = {
         }
         Relationships: []
       }
+      tickets: {
+        Row: {
+          code: string
+          created_at: string
+          email: string
+          event_vol: string
+          id: string
+          payment_method: string
+          quantity: number
+          ticket_number: number
+          tier_name: string
+          total_kes: number
+          user_id: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          email: string
+          event_vol: string
+          id?: string
+          payment_method: string
+          quantity: number
+          ticket_number: number
+          tier_name: string
+          total_kes: number
+          user_id?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          email?: string
+          event_vol?: string
+          id?: string
+          payment_method?: string
+          quantity?: number
+          ticket_number?: number
+          tier_name?: string
+          total_kes?: number
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -95,6 +137,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      verify_ticket_code: { Args: { _code: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "member"
