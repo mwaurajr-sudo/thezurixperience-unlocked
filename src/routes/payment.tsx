@@ -62,17 +62,19 @@ function PaymentPage() {
       return toast.error("Enter your bank transfer reference");
     }
     setSubmitting(true);
+    const insertRow = {
+      email,
+      tier_name: reservation.tier,
+      quantity: reservation.qty,
+      total_kes: reservation.total,
+      payment_method: method,
+      event_vol: reservation.eventVol,
+      user_id: user?.id ?? null,
+      // code + ticket_number are assigned by a DB trigger
+    } as never;
     const { data, error } = await supabase
       .from("tickets")
-      .insert({
-        email,
-        tier_name: reservation.tier,
-        quantity: reservation.qty,
-        total_kes: reservation.total,
-        payment_method: method,
-        event_vol: reservation.eventVol,
-        user_id: user?.id ?? null,
-      })
+      .insert(insertRow)
       .select("code, ticket_number")
       .single();
     setSubmitting(false);
