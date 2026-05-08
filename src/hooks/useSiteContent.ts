@@ -26,11 +26,27 @@ export interface TicketTier {
   perks: string;
 }
 
+export interface PlaylistEntry {
+  title: string;
+  dj: string;
+  url: string;
+  desc: string;
+  visibility: "members" | "public";
+}
+
+export interface RecordingEntry {
+  vol: string;
+  title: string;
+  url: string;
+}
+
 export interface PublicSiteContent {
   event: EventDetails;
   tickets: TicketTier[];
   ticketTagline: string;
   ticketSoldOut: string;
+  playlists: PlaylistEntry[];
+  recordings: RecordingEntry[];
 }
 
 const defaultContent: PublicSiteContent = {
@@ -57,6 +73,8 @@ const defaultContent: PublicSiteContent = {
   ],
   ticketTagline: "Capacity is intentionally small. Once a tier is gone, it's gone.",
   ticketSoldOut: "This chapter is full. Join the waitlist.",
+  playlists: [],
+  recordings: [],
 };
 
 export function useSiteContent() {
@@ -68,7 +86,14 @@ export function useSiteContent() {
     supabase
       .from("site_content")
       .select("section, data")
-      .in("section", ["event", "tickets", "ticketTagline", "ticketSoldOut"])
+      .in("section", [
+        "event",
+        "tickets",
+        "ticketTagline",
+        "ticketSoldOut",
+        "playlists",
+        "recordings",
+      ])
       .then(({ data }) => {
         if (cancelled || !data) {
           setLoading(false);
