@@ -42,9 +42,9 @@ export function AdminGate({ children }: { children: ReactNode }) {
         <p className="text-muted-foreground">You don't have superuser privileges.</p>
         <Button
           className="rounded-full bg-primary px-8 text-primary-foreground hover:bg-primary/90"
-          onClick={() => navigate({ to: "/" })}
+          onClick={() => navigate({ to: "/admin-login" })}
         >
-          Go home
+          Sign in as admin
         </Button>
       </div>
     );
