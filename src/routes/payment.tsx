@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AuthGate } from "@/components/AuthGate";
 import { SiteHeader } from "@/components/SiteHeader";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
 export const Route = createFileRoute("/payment")({
@@ -25,18 +24,16 @@ interface Reservation {
   eventDate: string;
 }
 
-type Method = "bank" | "mpesa";
-
 function PaymentPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [reservation, setReservation] = useState<Reservation | null>(null);
-  const [method, setMethod] = useState<Method>("mpesa");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [bankRef, setBankRef] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [issued, setIssued] = useState<{ code: string; number: number } | null>(null);
+
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
   useEffect(() => {
     const raw = sessionStorage.getItem("zuri_reservation");
@@ -50,41 +47,90 @@ function PaymentPage() {
     if (user?.email) setEmail(user.email);
   }, [user]);
 
+  const pollStatus = async (checkoutRequestId: string, emailStr: string) => {
+    let attempts = 0;
+    const maxAttempts = 15; // ~37 seconds
+    
+    const interval = setInterval(async () => {
+      attempts++;
+      if (attempts > maxAttempts) {
+        clearInterval(interval);
+        setSubmitting(false);
+        toast.error("Payment confirmation timed out. If you paid, your ticket will still be emailed to you shortly.", {
+          duration: 8000
+        });
+        return;
+      }
+      
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/payments/status/${checkoutRequestId}`);
+        const data = await res.json();
+        
+        if (data.success && data.status === "COMPLETED") {
+          clearInterval(interval);
+          setSubmitting(false);
+          setIssued({ code: data.ticket.code, number: data.ticket.number });
+          sessionStorage.removeItem("zuri_reservation");
+          toast.success(`Ticket issued: ${data.ticket.code}`);
+        } else if (data.success && data.status === "FAILED") {
+          clearInterval(interval);
+          setSubmitting(false);
+          toast.error(data.message || "Payment cancelled or failed.");
+        }
+      } catch (err) {
+        console.error("Polling error:", err);
+      }
+    }, 2500);
+  };
+
   const submit = async () => {
     if (!reservation) return;
     if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
       return toast.error("Enter a valid email");
     }
-    if (method === "mpesa" && !phone.trim()) {
+    if (!phone.trim()) {
       return toast.error("Enter your M-Pesa phone number");
     }
-    if (method === "bank" && !bankRef.trim()) {
-      return toast.error("Enter your bank transfer reference");
-    }
     setSubmitting(true);
-    const insertRow = {
-      email,
-      tier_name: reservation.tier,
-      quantity: reservation.qty,
-      total_kes: reservation.total,
-      payment_method: method,
-      event_vol: reservation.eventVol,
-      user_id: user?.id ?? null,
-      // code + ticket_number are assigned by a DB trigger
-    } as never;
-    const { data, error } = await supabase
-      .from("tickets")
-      .insert(insertRow)
-      .select("code, ticket_number")
-      .single();
-    setSubmitting(false);
-    if (error || !data) {
-      toast.error(error?.message ?? "Could not record payment");
-      return;
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/payments/stkpush`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          phone,
+          amount: reservation.total,
+          tierName: reservation.tier,
+          quantity: reservation.qty,
+          eventVol: reservation.eventVol,
+          userId: user?.id ?? null,
+          customerName: user?.email ? user.email.split("@")[0] : "Guest",
+          eventTitle: reservation.eventName,
+          eventDate: reservation.eventDate,
+          venue: reservation.eventName.includes("Ruby") ? "Ruby Lounge" : "",
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        setSubmitting(false);
+        toast.error(data.message || "Could not initiate payment");
+        return;
+      }
+
+      toast.success("STK Push sent. Check your phone for prompt.");
+      
+      // Start short polling for payment confirmation callback
+      pollStatus(data.checkoutRequestId, email);
+
+    } catch (err: any) {
+      setSubmitting(false);
+      toast.error(err.message || "Could not initiate payment");
     }
-    setIssued({ code: data.code, number: data.ticket_number });
-    sessionStorage.removeItem("zuri_reservation");
-    toast.success(`Ticket issued: ${data.code}`);
   };
 
   if (!reservation && !issued) {
@@ -175,27 +221,6 @@ function PaymentPage() {
               </div>
             </section>
 
-            <section className="mt-8">
-              <p className="text-xs uppercase tracking-[0.3em] text-primary/60">
-                [payment method]
-              </p>
-              <div className="mt-3 grid grid-cols-2 gap-3">
-                {(["mpesa", "bank"] as Method[]).map((m) => (
-                  <button
-                    key={m}
-                    onClick={() => setMethod(m)}
-                    className={`border px-4 py-3 text-xs uppercase tracking-[0.3em] ${
-                      method === m
-                        ? "border-primary bg-primary text-black"
-                        : "border-primary/40 text-primary/80 hover:border-primary"
-                    }`}
-                  >
-                    Pay via {m === "mpesa" ? "M-Pesa" : "Bank"}
-                  </button>
-                ))}
-              </div>
-            </section>
-
             <section className="mt-8 space-y-4 text-sm">
               <label className="block">
                 <span className="text-xs uppercase tracking-[0.3em] text-primary/60">
@@ -210,37 +235,20 @@ function PaymentPage() {
                 />
               </label>
 
-              {method === "mpesa" ? (
-                <label className="block">
-                  <span className="text-xs uppercase tracking-[0.3em] text-primary/60">
-                    M-Pesa phone number
-                  </span>
-                  <input
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="+254 7XX XXX XXX"
-                    className="mt-2 w-full border border-primary/40 bg-black px-3 py-2 text-primary placeholder:text-primary/30 focus:border-primary focus:outline-none"
-                  />
-                  <span className="mt-2 block text-xs text-primary/60">
-                    You'll receive an STK push. Approve to complete.
-                  </span>
-                </label>
-              ) : (
-                <label className="block">
-                  <span className="text-xs uppercase tracking-[0.3em] text-primary/60">
-                    Bank transfer reference
-                  </span>
-                  <input
-                    value={bankRef}
-                    onChange={(e) => setBankRef(e.target.value)}
-                    placeholder="Your name or transaction ref"
-                    className="mt-2 w-full border border-primary/40 bg-black px-3 py-2 text-primary placeholder:text-primary/30 focus:border-primary focus:outline-none"
-                  />
-                  <span className="mt-2 block text-xs text-primary/60">
-                    Transfer to: ZuriXperience Ltd · Equity Bank · Acc 0123456789
-                  </span>
-                </label>
-              )}
+              <label className="block">
+                <span className="text-xs uppercase tracking-[0.3em] text-primary/60">
+                  M-Pesa phone number
+                </span>
+                <input
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+254 7XX XXX XXX"
+                  className="mt-2 w-full border border-primary/40 bg-black px-3 py-2 text-primary placeholder:text-primary/30 focus:border-primary focus:outline-none"
+                />
+                <span className="mt-2 block text-xs text-primary/60">
+                  You'll receive an STK push. Approve to complete.
+                </span>
+              </label>
             </section>
 
             <button
