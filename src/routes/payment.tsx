@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { AuthGate } from "@/components/AuthGate";
 import { SiteHeader } from "@/components/SiteHeader";
 import { useAuth } from "@/contexts/AuthContext";
+import { DigitalTicketPass } from "@/components/DigitalTicketPass";
 
 export const Route = createFileRoute("/payment")({
   component: () => (
@@ -164,38 +165,39 @@ function PaymentPage() {
         </h1>
 
         {issued ? (
-          <section className="mt-10 border border-primary p-6">
-            <p className="text-xs uppercase tracking-[0.3em] text-primary/70">
-              [confirmed]
-            </p>
-            <h2 className="mt-3 text-xl uppercase tracking-[0.25em] text-primary">
-              Welcome to the house.
-            </h2>
-            <p className="mt-4 text-sm text-primary/80">
-              Your purchase is recorded. Ticket #{issued.number}.
-            </p>
-            <div className="mt-6 border border-primary/40 bg-primary/5 p-4">
-              <p className="text-xs uppercase tracking-[0.3em] text-primary/60">
-                Your code
+          <section className="mt-10 space-y-6">
+            <div className="text-center">
+              <p className="text-xs uppercase tracking-[0.3em] text-primary/70">
+                [confirmed]
               </p>
-              <p className="mt-2 text-3xl tracking-[0.4em] text-primary">
-                {issued.code}
+              <h2 className="mt-2 text-xl font-bold uppercase tracking-[0.25em] text-primary">
+                Welcome to the house.
+              </h2>
+              <p className="mt-2 text-xs text-primary/70">
+                A PDF copy has also been dispatched to <span className="text-primary font-bold">{email}</span>.
               </p>
             </div>
-            <p className="mt-6 text-sm text-primary/70">
-              A confirmation will be sent to <span className="text-primary">{email}</span>.
-              Save this code — you'll need it to unlock the playlist for this volume.
-            </p>
-            <div className="mt-8 flex gap-3 text-xs uppercase tracking-[0.3em]">
+
+            <DigitalTicketPass
+              code={issued.code}
+              tierName={reservation?.tier}
+              quantity={reservation?.qty}
+              eventTitle={reservation?.eventName || "The Zuri Experience"}
+              eventDate={reservation?.eventDate}
+              email={email}
+              totalKes={reservation?.total}
+            />
+
+            <div className="mt-8 flex justify-center gap-3 text-xs uppercase tracking-[0.3em] print:hidden">
               <button
                 onClick={() => navigate({ to: "/playlist" })}
-                className="border border-primary bg-primary px-4 py-2 text-black hover:bg-primary-glow"
+                className="border border-primary bg-primary px-6 py-2.5 text-black hover:bg-primary-glow font-bold"
               >
                 → Unlock playlist
               </button>
               <Link
                 to="/event"
-                className="border border-primary/40 px-4 py-2 text-primary/80 hover:border-primary"
+                className="border border-primary/40 px-6 py-2.5 text-primary/80 hover:border-primary flex items-center"
               >
                 Back to event
               </Link>

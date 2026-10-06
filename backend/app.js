@@ -28,8 +28,12 @@ if (!fs.existsSync(uploadsDir)) {
 }
 
 // Config CORS
-const allowedOrigins = [
-  process.env.FRONTEND_URL || "http://localhost:5173",
+const rawFrontendUrls = (process.env.FRONTEND_URL || "http://localhost:5173")
+  .split(",")
+  .map((url) => url.trim().replace(/\/$/, ""));
+
+const allowedOrigins = new Set([
+  ...rawFrontendUrls,
   "http://localhost:3000",
   "http://localhost:5173",
   "http://localhost:5174",
@@ -38,16 +42,17 @@ const allowedOrigins = [
   "http://127.0.0.1:5173",
   "http://127.0.0.1:8080",
   "http://127.0.0.1:8081",
-];
+]);
 
 app.use(
   cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (like mobile apps, curl, or callbacks from M-Pesa)
-      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      if (!origin || allowedOrigins.has(origin.replace(/\/$/, ""))) {
         callback(null, true);
       } else {
-        callback(new Error("CORS Policy Violation: Origin block."));
+        console.warn(`CORS blocked request from origin: ${origin}`);
+        callback(new Error(`CORS Policy Violation: Origin ${origin} is not allowed.`));
       }
     },
     credentials: true,
