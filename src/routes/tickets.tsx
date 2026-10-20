@@ -25,7 +25,7 @@ function TicketsPage() {
   const [searchingPass, setSearchingPass] = useState(false);
   const [foundPass, setFoundPass] = useState<DigitalTicketPassProps | null>(null);
 
-  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL ?? (import.meta.env.DEV ? "http://localhost:5000" : "");
 
   const handleLookupPass = async () => {
     if (!lookupQuery.trim()) {

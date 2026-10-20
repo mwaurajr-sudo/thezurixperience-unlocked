@@ -23,8 +23,12 @@ const __dirname = path.dirname(__filename);
 
 // Create temp uploads directory for PDF generation if not exists
 const uploadsDir = path.join(__dirname, "uploads");
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
+try {
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  }
+} catch {
+  // Directory might be read-only in serverless/container environments
 }
 
 // Config CORS
@@ -81,5 +85,7 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`TheZuriXperience Backend running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+  console.log(`TheZuriXperience Backend running in ${process.env.NODE_ENV || "development"} mode on port ${PORT}`);
 });
+
+export default app;

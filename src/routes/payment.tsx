@@ -34,7 +34,7 @@ function PaymentPage() {
   const [submitting, setSubmitting] = useState(false);
   const [issued, setIssued] = useState<{ code: string; number: number } | null>(null);
 
-  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL ?? (import.meta.env.DEV ? "http://localhost:5000" : "");
 
   useEffect(() => {
     const raw = sessionStorage.getItem("zuri_reservation");
