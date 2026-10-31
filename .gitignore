@@ -22,7 +22,10 @@ dist-ssr
 .dev.vars
 
 # Environment files
+.env
+.env.*
 *.env
+backend/.env
 
 # Editor directories and files
 .vscode/*

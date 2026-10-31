@@ -1,4 +1,4 @@
-import { Printer, CheckCircle2 } from "lucide-react";
+import { Printer, CheckCircle2, Download } from "lucide-react";
 
 export interface DigitalTicketPassProps {
   code: string;
@@ -9,6 +9,7 @@ export interface DigitalTicketPassProps {
   venue?: string;
   email?: string;
   totalKes?: number;
+  pdfUrl?: string;
 }
 
 export function DigitalTicketPass({
@@ -20,11 +21,8 @@ export function DigitalTicketPass({
   venue = "Ruby Lounge",
   email,
   totalKes,
+  pdfUrl,
 }: DigitalTicketPassProps) {
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
-    code
-  )}&color=bf2e26&bgcolor=0a0a0a`;
-
   const handlePrint = () => {
     window.print();
   };
@@ -46,21 +44,30 @@ export function DigitalTicketPass({
         </div>
       </div>
 
-      {/* Ticket QR Code Display */}
-      <div className="my-6 flex flex-col items-center justify-center rounded-lg border border-primary/30 bg-[#0a0a0a] p-4 text-center">
-        <div className="relative overflow-hidden rounded-md border border-primary/40 p-2 bg-[#0a0a0a]">
-          <img
-            src={qrUrl}
-            alt={`QR Pass for ${code}`}
-            className="h-44 w-44 object-contain brightness-110"
-            loading="eager"
-          />
-        </div>
-        <div className="mt-3 text-[10px] uppercase tracking-[0.3em] text-primary/60">
+      {/* Concert Gate Pass Code Block (No QR code) */}
+      <div className="my-6 flex flex-col items-center justify-center rounded-lg border border-primary/40 bg-[#0a0a0a] p-5 text-center">
+        <div className="text-[10px] uppercase tracking-[0.3em] text-primary/60">
           CONCERT GATE PASS CODE
         </div>
-        <div className="mt-1 text-2xl font-bold tracking-[0.35em] text-primary selection:bg-primary selection:text-black">
+        <div className="my-3 rounded-md border-2 border-primary bg-primary/10 px-6 py-2.5 text-3xl font-black tracking-[0.35em] text-primary selection:bg-primary selection:text-black">
           {code}
+        </div>
+        <p className="text-[11px] text-primary/70">
+          Use this code to unlock the DJ playlist & for door check-in
+        </p>
+
+        {/* Aesthetic Ticket Stub Barcode Lines */}
+        <div className="mt-4 flex items-center justify-center gap-[3px] py-1 opacity-75" aria-hidden="true">
+          {[4, 2, 6, 2, 4, 3, 2, 5, 2, 7, 3, 2, 4, 6, 2, 3, 5, 2, 4, 2, 6, 3, 2, 4, 5, 2, 3, 6, 2, 4].map((h, idx) => (
+            <div
+              key={idx}
+              className="bg-primary"
+              style={{
+                width: idx % 4 === 0 ? "3px" : idx % 2 === 0 ? "2px" : "1.5px",
+                height: `${22 + (h * 2)}px`,
+              }}
+            />
+          ))}
         </div>
       </div>
 
@@ -93,7 +100,7 @@ export function DigitalTicketPass({
       </div>
 
       {/* Actions */}
-      <div className="mt-6 flex items-center justify-center gap-3 print:hidden">
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-3 print:hidden">
         <button
           type="button"
           onClick={handlePrint}
@@ -101,10 +108,21 @@ export function DigitalTicketPass({
         >
           <Printer className="h-4 w-4" /> Save / Print Pass
         </button>
+        {pdfUrl && (
+          <a
+            href={pdfUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            download
+            className="flex items-center justify-center gap-2 rounded border border-primary/40 px-4 py-2.5 text-xs font-bold uppercase tracking-[0.2em] text-primary hover:border-primary hover:bg-primary/10 transition-all"
+          >
+            <Download className="h-4 w-4" /> Download PDF
+          </a>
+        )}
       </div>
 
       <p className="mt-4 text-center text-[9px] uppercase tracking-[0.2em] text-primary/50">
-        [ PRESENT QR AT FOYER DOOR FOR GATE SCANNER ACCESS ]
+        [ PRESENT PASS CODE AT DOOR · USE CODE TO UNLOCK PLAYLIST ]
       </p>
     </div>
   );

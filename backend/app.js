@@ -38,6 +38,7 @@ const rawFrontendUrls = (process.env.FRONTEND_URL || "http://localhost:5173")
 
 const allowedOrigins = new Set([
   ...rawFrontendUrls,
+  "https://thezurixperience-unlocked.vercel.app",
   "http://localhost:3000",
   "http://localhost:5173",
   "http://localhost:5174",
@@ -51,8 +52,12 @@ const allowedOrigins = new Set([
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps, curl, or callbacks from M-Pesa)
-      if (!origin || allowedOrigins.has(origin.replace(/\/$/, ""))) {
+      // Allow requests with no origin or matching allowed domains (including Vercel preview deployments)
+      if (
+        !origin ||
+        allowedOrigins.has(origin.replace(/\/$/, "")) ||
+        origin.endsWith(".vercel.app")
+      ) {
         callback(null, true);
       } else {
         console.warn(`CORS blocked request from origin: ${origin}`);

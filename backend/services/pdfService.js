@@ -56,8 +56,12 @@ export const generateTicketPDF = (data) => {
         { label: "EVENT VOL:", value: data.eventVol || "01" },
         { label: "VENUE:", value: data.venue || "Disclosed at door" },
         { label: "DATE & TIME:", value: data.eventDate || "Saturday, December 14" },
-        { label: "MPESA REF:", value: data.receiptNumber || "N/A" },
-        { label: "TOTAL PAID:", value: `KES ${Number(data.amountPaid).toLocaleString()}` },
+        data.amountPaid > 0
+          ? { label: "MPESA REF:", value: data.receiptNumber || "N/A" }
+          : { label: "ENTRY TYPE:", value: "DIRECT RSVP" },
+        data.amountPaid > 0
+          ? { label: "TOTAL PAID:", value: `KES ${Number(data.amountPaid).toLocaleString()}` }
+          : { label: "ACCESS:", value: "COMPLIMENTARY PASS" },
         { label: "ISSUED:", value: data.purchaseDate || new Date().toISOString().split("T")[0] },
       ];
 

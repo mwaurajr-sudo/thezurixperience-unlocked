@@ -23,8 +23,8 @@ function PlaylistPage() {
 
   const verify = async () => {
     const c = code.trim().toUpperCase();
-    if (!/^ZURI\d{3,}$/.test(c)) {
-      return toast.error("Code must look like ZURI001");
+    if (!/^ZURI\d{2,}$/.test(c)) {
+      return toast.error("Code must look like ZURI099 or ZURI99");
     }
     setChecking(true);
     const { data, error } = await supabase.rpc("verify_ticket_code", { _code: c });
@@ -62,7 +62,7 @@ function PlaylistPage() {
                 value={code}
                 onChange={(e) => setCode(e.target.value.toUpperCase())}
                 onKeyDown={(e) => e.key === "Enter" && verify()}
-                placeholder="ZURI001"
+                placeholder="ZURI099"
                 className="mt-2 w-full border border-primary/40 bg-black px-3 py-3 text-lg tracking-[0.3em] text-primary placeholder:text-primary/30 focus:border-primary focus:outline-none"
               />
             </label>
