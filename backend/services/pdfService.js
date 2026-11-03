@@ -54,7 +54,7 @@ export const generateTicketPDF = (data) => {
       const details = [
         { label: "EVENT VOL:", value: data.eventVol || "01" },
         { label: "VENUE:", value: data.venue || "Myra Residences, Kilimani" },
-        { label: "DATE & TIME:", value: data.eventDate || "Saturday, December 14" },
+        { label: "DATE & TIME:", value: data.eventDate || "6th November" },
         { label: "ENTRY TYPE:", value: "DIRECT RSVP" },
         { label: "ACCESS:", value: "COMPLIMENTARY PASS" },
         { label: "ISSUED:", value: data.issuedDate || new Date().toISOString().split("T")[0] },
@@ -86,7 +86,7 @@ export const generateTicketPDF = (data) => {
       doc.font("Courier").fontSize(8).fillColor(textGrey);
       doc.text("ADMITTANCE:", 455, 115);
       doc.font("Courier-Bold").fontSize(9).fillColor(textWhite);
-      doc.text("1 GUEST", 455, 127);
+      doc.text("YOU + PLUS ONE", 455, 127);
 
       // Vertical Barcode aesthetic using simple tall rectangle lines
       let barX = 460;

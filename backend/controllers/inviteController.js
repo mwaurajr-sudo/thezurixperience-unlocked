@@ -6,28 +6,35 @@ import { validateEmail } from "../utils/validators.js";
 // Sends happen one at a time inside the request, so the admin screen works through a long
 // list in batches of this size rather than risk a single request timing out.
 const MAX_INVITES_PER_REQUEST = 25;
+const MAX_NAME_LENGTH = 80;
 
 /**
- * Emails the event invite, with the RSVP link and instructions, to a batch of addresses.
+ * Emails the event invite, with the RSVP link, to a batch of guests ({ email, name }).
  * Anyone already invited is skipped unless `resend` is true.
  *
  * POST /api/invites
  */
 export const sendInvites = async (req, res, next) => {
-  const { emails, resend } = req.body;
+  const { guests, resend } = req.body;
 
   try {
-    if (!Array.isArray(emails) || emails.length === 0) {
+    if (!Array.isArray(guests) || guests.length === 0) {
       return res.status(400).json({ success: false, message: "Add at least one email address." });
     }
-    if (emails.length > MAX_INVITES_PER_REQUEST) {
+    if (guests.length > MAX_INVITES_PER_REQUEST) {
       return res.status(400).json({
         success: false,
         message: `Send at most ${MAX_INVITES_PER_REQUEST} invites at a time.`,
       });
     }
 
-    const cleanEmails = [...new Set(emails.map((email) => String(email).trim().toLowerCase()))];
+    const namesByEmail = new Map(
+      guests.map((guest) => [
+        String(guest?.email ?? "").trim().toLowerCase(),
+        String(guest?.name ?? "").trim().replace(/\s+/g, " ").slice(0, MAX_NAME_LENGTH),
+      ])
+    );
+    const cleanEmails = [...namesByEmail.keys()];
     const event = await getCurrentEvent();
 
     const { data: existing, error: existingErr } = await supabase
@@ -54,10 +61,9 @@ export const sendInvites = async (req, res, next) => {
       const row = { email, event_vol: event.vol };
       try {
         await sendInviteEmail(email, {
-          eventTitle: event.title,
+          guestName: namesByEmail.get(email),
           eventDate: event.date,
           doors: event.doors,
-          venue: event.venue,
           rsvpUrl: `${getSiteUrl()}/rsvp`,
         });
         row.status = "sent";

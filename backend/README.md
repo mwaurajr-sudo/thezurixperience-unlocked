@@ -61,7 +61,7 @@ Apply `supabase/migrations/20261103120000_rsvp_confirmation.sql` and `2026110313
 
 | Method | Path | Purpose |
 | --- | --- | --- |
-| POST | `/api/invites` | Admin only. Body `{ emails, resend }`, up to 25 addresses. Emails the event invite. |
+| POST | `/api/invites` | Admin only. Body `{ guests: [{ email, name }], resend }`, up to 25 guests. Emails the event invite. |
 | GET | `/api/rsvp/availability` | How many passes are left. |
 | POST | `/api/rsvp` | Body `{ email, customerName, tierName }`. Sends the confirmation email. |
 | POST | `/api/rsvp/confirm` | Body `{ token }`. Issues and emails the ticket. Safe to repeat. |

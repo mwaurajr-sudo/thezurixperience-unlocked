@@ -61,7 +61,7 @@ const detailRow = (label, value) => `
 /**
  * First email: asks the guest to confirm attendance.
  *
- * @param {Object} data - { customerName, eventTitle, eventDate, venue, confirmUrl }
+ * @param {Object} data - { customerName, eventTitle, eventDate, confirmUrl }
  * @returns {string} HTML body
  */
 const buildRsvpTemplate = (data) =>
@@ -76,8 +76,8 @@ const buildRsvpTemplate = (data) =>
       <div style="background-color:${BOX_BG};border:1px dashed ${PRIMARY_RED};padding:20px;margin-bottom:25px;">
         ${detailRow("EVENT", data.eventTitle.toUpperCase())}
         ${detailRow("DATE & TIME", data.eventDate)}
-        ${detailRow("VENUE", data.venue)}
-        ${detailRow("PASS", "ADMITS 1 GUEST")}
+        ${detailRow("VENUE", "Sent with your ticket")}
+        ${detailRow("PASS", "ADMITS YOU + A PLUS ONE")}
       </div>
       <a href="${escapeHtml(data.confirmUrl)}" style="display:block;text-align:center;background-color:${PRIMARY_RED};color:#000000;padding:14px;text-decoration:none;font-size:12px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;">Confirm Attendance →</a>
       <p style="font-size:11px;line-height:1.6;color:${TEXT_GREY};margin-top:20px;">
@@ -106,7 +106,7 @@ const buildTicketTemplate = (data) =>
         ${detailRow("EVENT", data.eventTitle.toUpperCase())}
         ${detailRow("DATE & TIME", data.eventDate)}
         ${detailRow("VENUE", data.venue)}
-        ${detailRow("PASS", "ADMITS 1 GUEST")}
+        ${detailRow("PASS", "ADMITS YOU + A PLUS ONE")}
       </div>
       ${paragraph(`
         ★ <strong>Door Access:</strong><br>
@@ -116,35 +116,47 @@ const buildTicketTemplate = (data) =>
   });
 
 /**
- * Event invite: the event details, the RSVP link and how to get a ticket.
+ * Event invite, in the organiser's wording, with the link to RSVP.
  *
- * @param {Object} data - { eventTitle, eventDate, doors, venue, rsvpUrl }
+ * @param {Object} data - { guestName, eventDate, doors, rsvpUrl }
  * @returns {string} HTML body
  */
-const buildInviteTemplate = (data) =>
-  buildLayout({
+const buildInviteTemplate = (data) => {
+  const listItem = (html) => `<li style="margin-bottom:6px;">${html}</li>`;
+  const callout = data.guestName
+    ? `<strong style="color:${TEXT_WHITE};">${escapeHtml(data.guestName)}</strong>, we want you at Zuri.`
+    : "We want you at Zuri.";
+
+  return buildLayout({
     title: "You're Invited",
     subtitle: "You're invited",
     body: `
       ${paragraph(`
-        You're invited to <strong style="color:${TEXT_WHITE};">${escapeHtml(data.eventTitle.toUpperCase())}</strong>. Entry is complimentary, but you need a ticket to get in.
+        Zuri started as a feeling. That one late night song that gets you in, deep. That's what's inside Zuri's Room. The feel, the intimacy; crafted by an art we all love; music. Come through, meet new people, sing some Bryson Tiller then go tell the story after. ${callout}
       `)}
-      <div style="background-color:${BOX_BG};border:1px dashed ${PRIMARY_RED};padding:20px;margin-bottom:25px;">
-        ${detailRow("EVENT", data.eventTitle.toUpperCase())}
-        ${detailRow("DATE", data.eventDate)}
-        ${detailRow("TIME", data.doors)}
-        ${detailRow("VENUE", data.venue)}
-      </div>
-      <a href="${escapeHtml(data.rsvpUrl)}" style="display:block;text-align:center;background-color:${PRIMARY_RED};color:#000000;padding:14px;text-decoration:none;font-size:12px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin-bottom:25px;">RSVP Now →</a>
       ${paragraph(`
-        <strong style="color:${TEXT_WHITE};">How to RSVP and get your ticket:</strong><br>
-        1. Press <strong>RSVP Now</strong> above, or open this link: <a href="${escapeHtml(data.rsvpUrl)}" style="color:${PRIMARY_RED};">${escapeHtml(data.rsvpUrl)}</a><br>
-        2. Press <strong>RSVP</strong> on the page, enter your name and email, then press <strong>Send RSVP</strong>. You don't need an account.<br>
-        3. Look for an email from <strong>Zuri</strong> and press <strong>Confirm Attendance</strong>. Check your spam folder if you don't see it.<br>
-        4. Your ticket arrives by email as a PDF. Save it and show your pass code at the door.
+        <strong style="color:${TEXT_WHITE};">What you should know:</strong>
+        <ul style="padding-left:18px;margin:10px 0 0 0;">
+          ${listItem(`Date: <strong style="color:${TEXT_WHITE};">${escapeHtml(data.eventDate)}</strong>`)}
+          ${listItem(`Venue: <strong style="color:${TEXT_WHITE};">Upon your confirmation</strong>`)}
+          ${listItem(`Time: <strong style="color:${TEXT_WHITE};">${escapeHtml(data.doors)}</strong>`)}
+          ${listItem("Bring your own bottle")}
+          ${listItem("Invite is valid for you and a plus one")}
+          ${listItem("Be prepared to be on camera for YT.")}
+        </ul>
       `)}
+      ${paragraph(`
+        *No payment to be made, bring yo bottle, lets have a good time.<br><br>
+        <strong style="color:${PRIMARY_RED};">ZURI</strong><br><br>
+        Kindly confirm your availability to receive further details.
+      `)}
+      <a href="${escapeHtml(data.rsvpUrl)}" style="display:block;text-align:center;background-color:${PRIMARY_RED};color:#000000;padding:14px;text-decoration:none;font-size:12px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;">Confirm Availability →</a>
+      <p style="font-size:11px;line-height:1.6;color:${TEXT_GREY};margin:0;">
+        Press the button and enter your name and email. We'll email you a link to confirm, then your ticket with the venue will follow.
+      </p>
     `,
   });
+};
 
 /**
  * Reads one sender's settings. Invites have their own account and never fall back to
@@ -286,6 +298,6 @@ export const sendTicketEmail = (toEmail, ticketData, pdfBuffer) =>
 export const sendInviteEmail = (toEmail, data) =>
   dispatch(readSender("INVITE_EMAIL"), {
     to: toEmail,
-    subject: `You're invited: ${data.eventTitle}`,
+    subject: data.guestName ? `${data.guestName}, we want you at Zuri` : "We want you at Zuri",
     html: buildInviteTemplate(data),
   });

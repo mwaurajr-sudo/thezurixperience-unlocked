@@ -21,7 +21,7 @@ function EventPage() {
       ? e.venue
       : e.locMode === "partial"
         ? "Nairobi · Exact venue at door"
-        : "Disclosed at door · Nairobi";
+        : "Shared upon confirmation";
 
   const lineup = [e.dj1, e.dj2, e.dj3].filter(Boolean);
   const lineupText =

@@ -13,6 +13,8 @@ import { validateEmail } from "../utils/validators.js";
 const TOKEN_LIFETIME_MS = 7 * 24 * 60 * 60 * 1000;
 const EMAIL_COOLDOWN_MS = 60 * 1000;
 const MAX_NAME_LENGTH = 80;
+// Each pass admits the guest and a plus one, whose name isn't collected.
+const GUESTS_PER_PASS = 2;
 
 // Same reply whatever state the address is in, so this endpoint can't reveal who has RSVP'd.
 const RSVP_RECEIVED = {
@@ -101,7 +103,7 @@ export const createRsvp = async (req, res, next) => {
           email: cleanEmail,
           full_name: fullName,
           tier_name: tierName,
-          quantity: 1,
+          quantity: GUESTS_PER_PASS,
           event_vol: event.vol,
           user_id: userId ?? existing?.user_id ?? null,
           token_hash: hashToken(token),
@@ -119,7 +121,6 @@ export const createRsvp = async (req, res, next) => {
         customerName: fullName,
         eventTitle: event.title,
         eventDate: event.date,
-        venue: event.venue,
         confirmUrl: `${getSiteUrl()}/rsvp/confirm?token=${token}`,
       });
     } catch (mailErr) {

@@ -269,7 +269,7 @@ function RsvpPage() {
                 <h2 className="mt-1 text-lg font-bold uppercase tracking-[0.2em] text-primary">
                   RSVP — {activeClaimTier.name}
                 </h2>
-                <p className="mt-1 text-xs text-primary/70">1 Guest · Vol. {e.vol}</p>
+                <p className="mt-1 text-xs text-primary/70">You + a plus one · Vol. {e.vol}</p>
               </div>
 
               <div className="mt-5 space-y-4 text-xs">

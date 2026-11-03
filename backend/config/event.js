@@ -4,7 +4,7 @@ import { supabase } from "./db.js";
 const DEFAULT_EVENT = {
   vol: "01",
   name: "RnB Nights",
-  date: "Saturday, December 14",
+  date: "6th November",
   doors: "9:00 PM — 4:00 AM",
   venue: "Myra Residences, Kilimani",
 };

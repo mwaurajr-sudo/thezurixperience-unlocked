@@ -14,8 +14,8 @@ export function DigitalTicketPass({
   code,
   quantity = 1,
   eventTitle = "The Zuri Experience",
-  eventDate = "Saturday, Dec 14",
-  venue = "Myra Residences, Kilimani",
+  eventDate = "6th November",
+  venue = "On your ticket email",
   email,
 }: DigitalTicketPassProps) {
   return (
@@ -71,7 +71,7 @@ export function DigitalTicketPass({
         <div className="flex justify-between border-b border-primary/10 pb-1.5">
           <span className="text-primary/60 uppercase tracking-[0.15em]">Pass:</span>
           <span className="font-bold text-primary uppercase">
-            {quantity} Guest{quantity > 1 ? "s" : ""}
+            {quantity > 1 ? "You + a plus one" : "1 Guest"}
           </span>
         </div>
         <div className="flex justify-between border-b border-primary/10 pb-1.5">
