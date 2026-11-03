@@ -111,13 +111,13 @@ function RsvpPage() {
   return (
     <div className="min-h-screen bg-black text-primary font-mono">
       {user && <SiteHeader />}
-      <main className="mx-auto max-w-3xl px-5 py-16">
+      <main className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-5 sm:py-16">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl uppercase tracking-[0.3em]">
+            <h1 className="break-words text-xl uppercase tracking-[0.2em] sm:text-2xl sm:tracking-[0.3em]">
               &gt; RSVP<span className="animate-blink">_</span>
             </h1>
-            <div className="mt-2 text-xs uppercase tracking-[0.3em] text-primary/60">
+            <div className="mt-2 break-words text-xs uppercase tracking-[0.15em] text-primary/60 sm:tracking-[0.3em]">
               Vol. {e.vol} — {e.name} · {e.date}
             </div>
           </div>
@@ -225,15 +225,15 @@ function RsvpPage() {
               return (
                 <div
                   key={t.name}
-                  className="border border-primary/30 bg-black p-5 hover:border-primary/60 transition-colors"
+                  className="border border-primary/30 bg-black p-4 hover:border-primary/60 transition-colors sm:p-5"
                 >
-                  <div className="flex items-baseline justify-between gap-4">
-                    <div>
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
+                    <div className="min-w-0">
                       <p className="text-base uppercase tracking-[0.25em] text-primary font-bold">
                         {t.name}
                       </p>
-                      <div className="mt-1 flex items-baseline gap-2">
-                        <span className="text-2xl text-primary font-extrabold tracking-wider">
+                      <div className="mt-1 flex flex-wrap items-baseline gap-x-2">
+                        <span className="text-xl text-primary font-extrabold tracking-wider sm:text-2xl">
                           COMPLIMENTARY
                         </span>
                         <span className="text-xs uppercase tracking-[0.2em] text-primary/50 font-normal">
@@ -241,7 +241,7 @@ function RsvpPage() {
                         </span>
                       </div>
                     </div>
-                    <div className="text-right text-xs uppercase tracking-[0.2em] text-primary/60">
+                    <div className="shrink-0 text-xs uppercase tracking-[0.2em] text-primary/60 sm:text-right">
                       {soldOut ? "Fully Booked" : `${left} passes left`}
                     </div>
                   </div>

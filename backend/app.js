@@ -14,6 +14,7 @@ import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
 
 // Import router files
 import inviteRoutes from "./routes/inviteRoutes.js";
+import playlistRoutes from "./routes/playlistRoutes.js";
 import rsvpRoutes from "./routes/rsvpRoutes.js";
 import ticketRoutes from "./routes/ticketRoutes.js";
 
@@ -85,6 +86,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Dynamic routes registration
 app.use("/api/invites", inviteRoutes);
+app.use("/api/playlist", playlistRoutes);
 app.use("/api/rsvp", rsvpRoutes);
 app.use("/api/tickets", ticketRoutes);
 

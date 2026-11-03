@@ -1,5 +1,5 @@
-// Tracklist for the Playlist page. Add, remove or reorder songs here.
-export const tracklist: string[] = [
+// Tracklist for the Playlist page, only sent to guests who enter the access code. Add, remove or reorder songs here.
+export const tracklist = [
   "Settle Down",
   "High Life",
   "Every Gyal",

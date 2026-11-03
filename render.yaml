@@ -33,5 +33,7 @@ services:
         sync: false
       - key: INVITE_EMAIL_FROM
         sync: false
+      - key: PLAYLIST_CODE
+        sync: false
       - key: RESEND_API_KEY
         sync: false

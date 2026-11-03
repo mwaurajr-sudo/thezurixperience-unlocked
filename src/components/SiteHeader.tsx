@@ -21,20 +21,20 @@ export function SiteHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-primary/30 bg-black">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-4">
-        <Link to="/about" className="flex items-center gap-2">
-          <img src={logo} alt="ZX" className="h-8 w-8" />
-          <span className="font-mono text-sm uppercase tracking-[0.25em] text-primary">
+    <header className="z-50 border-b border-primary/30 bg-black md:sticky md:top-0">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-5">
+        <Link to="/about" className="flex min-w-0 items-center gap-2">
+          <img src={logo} alt="ZX" className="h-8 w-8 shrink-0" />
+          <span className="font-mono text-sm uppercase tracking-[0.15em] text-primary sm:tracking-[0.25em]">
             TheZuriXperience
           </span>
         </Link>
-        <nav className="flex flex-wrap items-center gap-x-5 gap-y-2">
+        <nav className="flex flex-wrap items-center gap-x-4 gap-y-2 sm:gap-x-5">
           {links.map((l) => (
             <Link
               key={l.label}
               to={l.to}
-              className="font-mono text-xs uppercase tracking-[0.3em] text-primary/70 hover:text-primary"
+              className="font-mono text-xs uppercase tracking-[0.15em] text-primary/70 hover:text-primary sm:tracking-[0.3em]"
               activeProps={{ className: "text-primary" }}
             >
               {l.label}
@@ -42,7 +42,7 @@ export function SiteHeader() {
           ))}
           <button
             onClick={onSignOut}
-            className="font-mono text-xs uppercase tracking-[0.3em] text-primary/50 hover:text-primary"
+            className="font-mono text-xs uppercase tracking-[0.15em] text-primary/50 hover:text-primary sm:tracking-[0.3em]"
           >
             [out]
           </button>

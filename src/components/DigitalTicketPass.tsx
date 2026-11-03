@@ -19,28 +19,28 @@ export function DigitalTicketPass({
   email,
 }: DigitalTicketPassProps) {
   return (
-    <div className="relative mx-auto w-full max-w-md overflow-hidden rounded-xl border-2 border-primary/80 bg-black/95 p-6 font-mono text-primary shadow-[0_0_30px_rgba(191,46,38,0.25)] backdrop-blur-md">
+    <div className="relative mx-auto w-full max-w-md overflow-hidden rounded-xl border-2 border-primary/80 bg-black/95 p-4 font-mono sm:p-6 text-primary shadow-[0_0_30px_rgba(191,46,38,0.25)] backdrop-blur-md">
       {/* Top Header Badge */}
-      <div className="flex items-center justify-between border-b border-primary/30 pb-4">
-        <div>
-          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-primary/70">
+      <div className="flex items-center justify-between gap-3 border-b border-primary/30 pb-4">
+        <div className="min-w-0">
+          <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-primary/70 sm:tracking-[0.3em]">
             ★ OFFICIAL ENTRY VOUCHER ★
           </span>
-          <h3 className="mt-1 text-lg font-extrabold uppercase tracking-[0.2em] text-primary">
+          <h3 className="mt-1 break-words text-lg font-extrabold uppercase tracking-[0.2em] text-primary">
             {eventTitle}
           </h3>
         </div>
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20 text-primary">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">
           <CheckCircle2 className="h-5 w-5 text-primary" />
         </div>
       </div>
 
       {/* Concert Gate Pass Code Block (No QR code) */}
-      <div className="my-6 flex flex-col items-center justify-center rounded-lg border border-primary/40 bg-[#0a0a0a] p-5 text-center">
-        <div className="text-[10px] uppercase tracking-[0.3em] text-primary/60">
+      <div className="my-6 flex flex-col items-center justify-center rounded-lg border border-primary/40 bg-[#0a0a0a] p-3 text-center sm:p-5">
+        <div className="text-[10px] uppercase tracking-[0.15em] text-primary/60 sm:tracking-[0.3em]">
           CONCERT GATE PASS CODE
         </div>
-        <div className="my-3 rounded-md border-2 border-primary bg-primary/10 px-6 py-2.5 text-3xl font-black tracking-[0.35em] text-primary selection:bg-primary selection:text-black">
+        <div className="my-3 rounded-md border-2 border-primary bg-primary/10 px-3 py-2.5 text-2xl font-black tracking-[0.2em] sm:px-6 sm:text-3xl sm:tracking-[0.35em] text-primary selection:bg-primary selection:text-black">
           {code}
         </div>
         <p className="text-[11px] text-primary/70">Show this code at the door to check in</p>
@@ -67,25 +67,25 @@ export function DigitalTicketPass({
       </div>
 
       {/* Details Grid */}
-      <div className="space-y-2.5 rounded-lg border border-primary/20 bg-primary/5 p-4 text-xs">
-        <div className="flex justify-between border-b border-primary/10 pb-1.5">
-          <span className="text-primary/60 uppercase tracking-[0.15em]">Pass:</span>
-          <span className="font-bold text-primary uppercase">
+      <div className="space-y-2.5 rounded-lg border border-primary/20 bg-primary/5 p-3 text-xs sm:p-4">
+        <div className="flex justify-between gap-3 border-b border-primary/10 pb-1.5">
+          <span className="shrink-0 text-primary/60 uppercase tracking-[0.15em]">Pass:</span>
+          <span className="min-w-0 break-words text-right font-bold text-primary uppercase">
             {quantity > 1 ? "You + a plus one" : "1 Guest"}
           </span>
         </div>
-        <div className="flex justify-between border-b border-primary/10 pb-1.5">
-          <span className="text-primary/60 uppercase tracking-[0.15em]">Date & Time:</span>
-          <span className="font-bold text-primary">{eventDate}</span>
+        <div className="flex justify-between gap-3 border-b border-primary/10 pb-1.5">
+          <span className="shrink-0 text-primary/60 uppercase tracking-[0.15em]">Date & Time:</span>
+          <span className="min-w-0 break-words text-right font-bold text-primary">{eventDate}</span>
         </div>
-        <div className="flex justify-between border-b border-primary/10 pb-1.5">
-          <span className="text-primary/60 uppercase tracking-[0.15em]">Venue:</span>
-          <span className="font-bold text-primary">{venue}</span>
+        <div className="flex justify-between gap-3 border-b border-primary/10 pb-1.5">
+          <span className="shrink-0 text-primary/60 uppercase tracking-[0.15em]">Venue:</span>
+          <span className="min-w-0 break-words text-right font-bold text-primary">{venue}</span>
         </div>
         {email && (
-          <div className="flex justify-between border-b border-primary/10 pb-1.5">
-            <span className="text-primary/60 uppercase tracking-[0.15em]">Recipient:</span>
-            <span className="font-bold text-primary truncate max-w-[180px]">{email}</span>
+          <div className="flex justify-between gap-3 border-b border-primary/10 pb-1.5">
+            <span className="shrink-0 text-primary/60 uppercase tracking-[0.15em]">Recipient:</span>
+            <span className="min-w-0 truncate font-bold text-primary">{email}</span>
           </div>
         )}
       </div>
