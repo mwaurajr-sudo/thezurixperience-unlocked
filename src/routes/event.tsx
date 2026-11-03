@@ -82,10 +82,10 @@ function EventPage() {
 
             <div className="mt-10 flex flex-wrap gap-3 font-mono">
               <Link
-                to="/tickets"
+                to="/rsvp"
                 className="border border-primary bg-primary px-5 py-3 text-xs uppercase tracking-[0.3em] text-black hover:bg-primary-glow"
               >
-                → Get tickets
+                → RSVP
               </Link>
               <Link
                 to="/about"

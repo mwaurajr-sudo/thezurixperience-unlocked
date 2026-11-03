@@ -13,23 +13,36 @@ dotenv.config();
 import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
 
 // Import router files
-import paymentRoutes from "./routes/paymentRoutes.js";
+import inviteRoutes from "./routes/inviteRoutes.js";
+import rsvpRoutes from "./routes/rsvpRoutes.js";
 import ticketRoutes from "./routes/ticketRoutes.js";
 
 const app = express();
+
+// Render and Vercel sit one proxy in front of us; rate limiting needs the real client IP
+app.set("trust proxy", 1);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Create temp uploads directory for PDF generation if not exists
 const uploadsDir = path.join(__dirname, "uploads");
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
+try {
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  }
+} catch {
+  // Directory might be read-only in serverless/container environments
 }
 
 // Config CORS
-const allowedOrigins = [
-  process.env.FRONTEND_URL || "http://localhost:5173",
+const rawFrontendUrls = (process.env.FRONTEND_URL || "http://localhost:5173")
+  .split(",")
+  .map((url) => url.trim().replace(/\/$/, ""));
+
+const allowedOrigins = new Set([
+  ...rawFrontendUrls,
+  "https://thezurixperience-unlocked.vercel.app",
   "http://localhost:3000",
   "http://localhost:5173",
   "http://localhost:5174",
@@ -38,16 +51,21 @@ const allowedOrigins = [
   "http://127.0.0.1:5173",
   "http://127.0.0.1:8080",
   "http://127.0.0.1:8081",
-];
+]);
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps, curl, or callbacks from M-Pesa)
-      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      // Allow requests with no origin or matching allowed domains (including Vercel preview deployments)
+      if (
+        !origin ||
+        allowedOrigins.has(origin.replace(/\/$/, "")) ||
+        origin.endsWith(".vercel.app")
+      ) {
         callback(null, true);
       } else {
-        callback(new Error("CORS Policy Violation: Origin block."));
+        console.warn(`CORS blocked request from origin: ${origin}`);
+        callback(new Error(`CORS Policy Violation: Origin ${origin} is not allowed.`));
       }
     },
     credentials: true,
@@ -62,7 +80,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Dynamic routes registration
-app.use("/api/payments", paymentRoutes);
+app.use("/api/invites", inviteRoutes);
+app.use("/api/rsvp", rsvpRoutes);
 app.use("/api/tickets", ticketRoutes);
 
 // Health check endpoint
@@ -75,6 +94,10 @@ app.use(notFound);
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`TheZuriXperience Backend running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-});
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`TheZuriXperience Backend running in ${process.env.NODE_ENV || "development"} mode on port ${PORT}`);
+  });
+}
+
+export default app;

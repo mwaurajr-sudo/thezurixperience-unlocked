@@ -1,150 +1,70 @@
-# TheZuriXperience — Integrated Payment & Ticketing Backend
+# TheZuriXperience — RSVP & Ticketing Backend
 
-This directory houses the highly scalable Node.js + Express.js backend for Safaricom Daraja M-Pesa payments, sequential ticketing sequence, professional PDF generation, and custom Nodemailer notifications.
+Node.js + Express backend for guest RSVPs, ticket issuing, PDF passes and email delivery.
 
----
+## How an RSVP works
 
-## 📂 Backend Architecture
+1. An admin pastes guest emails under **Tickets & RSVPs** and sends invites: `POST /api/invites`. They go out from the **invite sender** (`INVITE_EMAIL_*`) with the RSVP link and instructions.
+2. The guest enters their email on the public `/rsvp` page, with no account needed: `POST /api/rsvp`.
+3. They automatically get an email from the **main sender** (`EMAIL_*`) with a link to `/rsvp/confirm`.
+4. They press **Confirm Attendance**: `POST /api/rsvp/confirm`.
+5. A ticket is issued and automatically emailed with its PDF from the main sender.
+
+Codes count down from `ZURI099` to `ZURI001`; after that, confirmations are refused. RSVPing again with the same email sends a new confirmation link, or re-sends the ticket if one was already issued. Admins see RSVPs under **Tickets & RSVPs**.
+
+## Backend Architecture
 
 ```
 backend/
   ├── config/
-  │    └── db.js               # Supabase admin initialization client
+  │    ├── db.js               # Supabase admin client
+  │    └── event.js            # Current event and tiers from site_content
   ├── controllers/
-  │    ├── paymentController.js# STK push, callbacks, status short polling
-  │    └── ticketController.js # Gated ticket verification
+  │    ├── inviteController.js # Event invites
+  │    ├── rsvpController.js   # RSVP and attendance confirmation
+  │    └── ticketController.js # Ticket verification
   ├── routes/
-  │    ├── paymentRoutes.js    # Routes for /api/payments
+  │    ├── inviteRoutes.js     # Routes for /api/invites
+  │    ├── rsvpRoutes.js       # Routes for /api/rsvp
   │    └── ticketRoutes.js     # Routes for /api/tickets
   ├── services/
-  │    ├── mpesaService.js     # Safaricom Daraja API integrations
-  │    ├── pdfService.js       # Bespoke PDF Kit ticket compiler
-  │    └── emailService.js     # Custom HTML email attachments
+  │    ├── ticketService.js    # Code allocation and ticket delivery
+  │    ├── pdfService.js       # PDF ticket generation
+  │    └── emailService.js     # Invite, RSVP and ticket emails
   ├── middleware/
-  │    └── errorMiddleware.js  # GlobalExpress exception handlers
+  │    ├── authMiddleware.js   # Admin check
+  │    └── errorMiddleware.js  # Express exception handlers
   ├── utils/
-  │    └── validators.js       # Mobile phone format validation helpers
-  ├── templates/
-  │    └── emailTemplate.js    # Standard visual layouts
-  ├── app.js                   # Server bootstrap script
-  ├── package.json             # Service packages list
-  └── .env.example             # Configuration templates
+  │    └── validators.js       # Email validation
+  └── app.js                   # Server bootstrap
 ```
 
----
+## Setup
 
-## ⚡ Setup & Installation
-
-### 1. Install Dependencies
-Run the following inside the `backend` folder:
 ```bash
 npm install
-```
-
-### 2. Configure Environment Variables
-Copy `.env.example` to a new `.env` file:
-```bash
 cp .env.example .env
-```
-Fill in the variables in your `.env` file:
-* **SUPABASE_URL** & **SUPABASE_SERVICE_ROLE_KEY**: Obtain from your Supabase Dashboard under Project Settings > API. Ensure you use the **service_role** key so that the backend has administrative rights to bypass Row Level Security policies (upload PDF tickets and write payment details).
-* **Daraja API credentials**: Obtain sandbox/production consumer keys and secrets from the Safaricom Developer Portal. Set the callback URL to the public URL pointing to your backend endpoint (e.g. `https://yourdomain.com/api/payments/callback`).
-* **Email credentials**: Setup Gmail App Passwords (if using Gmail SMTP) or input your Resend API token.
-
-### 3. Setup Supabase Database
-Execute the SQL migration scripts located in your `supabase/migrations/20260529220000_mpesa_ticketing.sql` file via the **Supabase SQL Editor** to create the necessary tables (`users`, `events`, `payments`), add linkage columns (`pdf_url`, `event_id`, `payment_id`, `used`), and initialize the `zuri_ticket_code_seq` sequences.
-
-### 4. Create Supabase Storage Bucket
-1. Open the Supabase Dashboard.
-2. Navigate to **Storage** and click **New Bucket**.
-3. Create a bucket named strictly: **`tickets`**.
-4. Set its access control to **`Public`** so that the backend can generate downloadable, shareable PDF links for email attachments and ticket display.
-
----
-
-## 🚀 Running the Server
-
-### Development mode (with hot reloading):
-```bash
 npm run dev
 ```
 
-### Production mode:
-```bash
-npm start
-```
-The server will boot by default on port `5000` (e.g., `http://localhost:5000`).
+Fill in `.env` with two separate mail accounts: the main sender and the invite sender. For Gmail, turn on 2-Step Verification on each account and create an [app password](https://myaccount.google.com/apppasswords) for each. Set `PUBLIC_SITE_URL` to the site's address, because confirmation links are built from it.
 
----
+All emails show "Zuri" as the sender name. The invite sender has no fallback: if `INVITE_EMAIL_*` is missing, invites fail and are listed as failed. If a ticket email fails, the ticket is still shown on the confirm page, and the email is retried when the guest opens their link again.
 
-## 📡 API Reference Endpoints
+### Database
 
-### 1. Initiate STK Push Payment
-* **Route**: `POST /api/payments/stkpush`
-* **Body**:
-  ```json
-  {
-    "email": "customer@gmail.com",
-    "phone": "0712345678",
-    "amount": 2500,
-    "tierName": "General",
-    "quantity": 1,
-    "eventVol": "01",
-    "userId": "uuid-from-auth-context",
-    "customerName": "Alvin Nderitu",
-    "eventTitle": "RnB Nights (Vol. 01)",
-    "eventDate": "Saturday, December 14"
-  }
-  ```
+Apply `supabase/migrations/20261103120000_rsvp_confirmation.sql` and `20261103130000_event_invites.sql` before running this version.
 
-### 2. Poll Checkout Status
-* **Route**: `GET /api/payments/status/:checkoutRequestId`
-* **Response**:
-  * **Pending**: `{ "success": true, "status": "PENDING" }`
-  * **Failed**: `{ "success": true, "status": "FAILED", "message": "..." }`
-  * **Completed**: 
-    ```json
-    {
-      "success": true,
-      "status": "COMPLETED",
-      "ticket": {
-        "code": "ZURI002",
-        "pdfUrl": "https://...",
-        "number": 2
-      }
-    }
-    ```
+`supabase/manual/drop_payments.sql` removes the old payment table and columns. It permanently deletes payment records, so it is not an automatic migration. The app works with or without it.
 
-### 3. Verify Concert Ticket Code
-* **Route**: `GET /api/tickets/verify/:ticketCode`
-* **Query Parameters**: `?markUsed=true` (marks the ticket as scanned and invalid for reuse).
-* **Response**:
-  ```json
-  {
-    "success": true,
-    "valid": true,
-    "status": "UNUSED",
-    "message": "...",
-    "ticket": {
-      "code": "ZURI002",
-      "tierName": "General",
-      "quantity": 1,
-      "eventTitle": "RnB Nights (Vol. 01)",
-      "email": "customer@gmail.com"
-    }
-  }
-  ```
+## API
 
----
-
-## 🌐 Production Deployment
-
-### 1. Deploying on Render / Heroku
-1. Push your repository to GitHub.
-2. Connect your repository to your Render/Heroku dashboard.
-3. Configure the Root Directory setting to **`backend`** (if deploying from a monorepo) or deploy as a standalone service.
-4. Input all the environment variables from your local `.env` file into your host's **Environment Settings** dashboard.
-5. Setup the start command to: `npm start`.
-
-### 2. Configure Callback URL
-Ensure that your Safaricom developer account's callback URL matches your live production domain (e.g. `https://your-app-backend.onrender.com/api/payments/callback`). Safaricom requires standard HTTPS ports (`443`) for production callback triggers.
+| Method | Path | Purpose |
+| --- | --- | --- |
+| POST | `/api/invites` | Admin only. Body `{ emails, resend }`, up to 25 addresses. Emails the event invite. |
+| GET | `/api/rsvp/availability` | How many passes are left. |
+| POST | `/api/rsvp` | Body `{ email, customerName, tierName }`. Sends the confirmation email. |
+| POST | `/api/rsvp/confirm` | Body `{ token }`. Issues and emails the ticket. Safe to repeat. |
+| GET | `/api/tickets/verify/:ticketCode` | Checks a ticket. `?markUsed=true` checks it in. |
+| GET | `/api/tickets/pass/:ticketCode` | Downloads the PDF pass. |
+| GET | `/health` | Health check. |

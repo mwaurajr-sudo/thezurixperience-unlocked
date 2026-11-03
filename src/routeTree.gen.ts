@@ -9,25 +9,25 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TicketsRouteImport } from './routes/tickets'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as RsvpRouteImport } from './routes/rsvp'
 import { Route as RecordingsRouteImport } from './routes/recordings'
 import { Route as PlaylistRouteImport } from './routes/playlist'
-import { Route as PaymentRouteImport } from './routes/payment'
 import { Route as EventRouteImport } from './routes/event'
 import { Route as AdminLoginRouteImport } from './routes/admin-login'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as RsvpConfirmRouteImport } from './routes/rsvp_.confirm'
 
-const TicketsRoute = TicketsRouteImport.update({
-  id: '/tickets',
-  path: '/tickets',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RsvpRoute = RsvpRouteImport.update({
+  id: '/rsvp',
+  path: '/rsvp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RecordingsRoute = RecordingsRouteImport.update({
@@ -38,11 +38,6 @@ const RecordingsRoute = RecordingsRouteImport.update({
 const PlaylistRoute = PlaylistRouteImport.update({
   id: '/playlist',
   path: '/playlist',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PaymentRoute = PaymentRouteImport.update({
-  id: '/payment',
-  path: '/payment',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EventRoute = EventRouteImport.update({
@@ -70,6 +65,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RsvpConfirmRoute = RsvpConfirmRouteImport.update({
+  id: '/rsvp_/confirm',
+  path: '/rsvp/confirm',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -77,11 +77,11 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/admin-login': typeof AdminLoginRoute
   '/event': typeof EventRoute
-  '/payment': typeof PaymentRoute
   '/playlist': typeof PlaylistRoute
   '/recordings': typeof RecordingsRoute
+  '/rsvp': typeof RsvpRoute
   '/settings': typeof SettingsRoute
-  '/tickets': typeof TicketsRoute
+  '/rsvp/confirm': typeof RsvpConfirmRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -89,11 +89,11 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/admin-login': typeof AdminLoginRoute
   '/event': typeof EventRoute
-  '/payment': typeof PaymentRoute
   '/playlist': typeof PlaylistRoute
   '/recordings': typeof RecordingsRoute
+  '/rsvp': typeof RsvpRoute
   '/settings': typeof SettingsRoute
-  '/tickets': typeof TicketsRoute
+  '/rsvp/confirm': typeof RsvpConfirmRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -102,11 +102,11 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/admin-login': typeof AdminLoginRoute
   '/event': typeof EventRoute
-  '/payment': typeof PaymentRoute
   '/playlist': typeof PlaylistRoute
   '/recordings': typeof RecordingsRoute
+  '/rsvp': typeof RsvpRoute
   '/settings': typeof SettingsRoute
-  '/tickets': typeof TicketsRoute
+  '/rsvp_/confirm': typeof RsvpConfirmRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -116,11 +116,11 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin-login'
     | '/event'
-    | '/payment'
     | '/playlist'
     | '/recordings'
+    | '/rsvp'
     | '/settings'
-    | '/tickets'
+    | '/rsvp/confirm'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -128,11 +128,11 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin-login'
     | '/event'
-    | '/payment'
     | '/playlist'
     | '/recordings'
+    | '/rsvp'
     | '/settings'
-    | '/tickets'
+    | '/rsvp/confirm'
   id:
     | '__root__'
     | '/'
@@ -140,11 +140,11 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin-login'
     | '/event'
-    | '/payment'
     | '/playlist'
     | '/recordings'
+    | '/rsvp'
     | '/settings'
-    | '/tickets'
+    | '/rsvp_/confirm'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -153,27 +153,27 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   AdminLoginRoute: typeof AdminLoginRoute
   EventRoute: typeof EventRoute
-  PaymentRoute: typeof PaymentRoute
   PlaylistRoute: typeof PlaylistRoute
   RecordingsRoute: typeof RecordingsRoute
+  RsvpRoute: typeof RsvpRoute
   SettingsRoute: typeof SettingsRoute
-  TicketsRoute: typeof TicketsRoute
+  RsvpConfirmRoute: typeof RsvpConfirmRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/tickets': {
-      id: '/tickets'
-      path: '/tickets'
-      fullPath: '/tickets'
-      preLoaderRoute: typeof TicketsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/settings': {
       id: '/settings'
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rsvp': {
+      id: '/rsvp'
+      path: '/rsvp'
+      fullPath: '/rsvp'
+      preLoaderRoute: typeof RsvpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/recordings': {
@@ -188,13 +188,6 @@ declare module '@tanstack/react-router' {
       path: '/playlist'
       fullPath: '/playlist'
       preLoaderRoute: typeof PlaylistRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/payment': {
-      id: '/payment'
-      path: '/payment'
-      fullPath: '/payment'
-      preLoaderRoute: typeof PaymentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/event': {
@@ -232,6 +225,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/rsvp_/confirm': {
+      id: '/rsvp_/confirm'
+      path: '/rsvp/confirm'
+      fullPath: '/rsvp/confirm'
+      preLoaderRoute: typeof RsvpConfirmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -241,11 +241,11 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   AdminLoginRoute: AdminLoginRoute,
   EventRoute: EventRoute,
-  PaymentRoute: PaymentRoute,
   PlaylistRoute: PlaylistRoute,
   RecordingsRoute: RecordingsRoute,
+  RsvpRoute: RsvpRoute,
   SettingsRoute: SettingsRoute,
-  TicketsRoute: TicketsRoute,
+  RsvpConfirmRoute: RsvpConfirmRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

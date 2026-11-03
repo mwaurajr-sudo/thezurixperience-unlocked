@@ -11,6 +11,7 @@ node_modules
 dist
 dist-ssr
 .output
+.vercel
 .vinxi
 .tanstack/**
 .nitro
@@ -21,7 +22,11 @@ dist-ssr
 .dev.vars
 
 # Environment files
+.env
+.env.*
+!.env.production
 *.env
+backend/.env
 
 # Editor directories and files
 .vscode/*

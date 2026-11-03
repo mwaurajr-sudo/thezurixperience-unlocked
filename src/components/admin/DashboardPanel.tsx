@@ -1,6 +1,7 @@
 import { useAdminContent } from "@/contexts/AdminContentContext";
 import { PanelHeader } from "@/components/admin/AdminFields";
 import type { AdminPanel } from "@/components/AdminLayout";
+import { usePassesLeft } from "@/hooks/usePassesLeft";
 import { CalendarDays, Ticket, ShoppingBag, Users, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -12,10 +13,10 @@ export function DashboardPanel({ onNavigate }: Props) {
   const { content } = useAdminContent();
   const { event, tickets } = content;
 
-  const totalCap = tickets.reduce((s, t) => s + t.cap, 0);
-  const totalSold = tickets.reduce((s, t) => s + t.sold, 0);
-  const totalLeft = totalCap - totalSold;
-  const fillPct = totalCap > 0 ? Math.round((totalSold / totalCap) * 100) : 0;
+  const passes = usePassesLeft();
+  const totalCap = passes?.total ?? tickets.reduce((s, t) => s + t.cap, 0);
+  const totalLeft = passes?.left ?? totalCap - tickets.reduce((s, t) => s + t.sold, 0);
+  const fillPct = totalCap > 0 ? Math.round(((totalCap - totalLeft) / totalCap) * 100) : 0;
 
   const stats = [
     { label: "Tickets remaining", value: totalLeft, sub: `${fillPct}% capacity filled`, icon: Ticket, panel: "tickets" as AdminPanel },
@@ -80,13 +81,15 @@ export function DashboardPanel({ onNavigate }: Props) {
         <div className="mb-5 text-[11px] uppercase tracking-[0.2em] text-primary">Ticket tiers</div>
         <div className="space-y-4">
           {tickets.map((t) => {
-            const pct = t.cap > 0 ? (t.sold / t.cap) * 100 : 0;
+            const cap = passes?.total ?? t.cap;
+            const left = passes?.left ?? t.cap - t.sold;
+            const pct = cap > 0 ? ((cap - left) / cap) * 100 : 0;
             return (
               <div key={t.name}>
                 <div className="flex items-center justify-between text-sm">
                   <span className="font-medium">{t.name}</span>
                   <span className="text-muted-foreground">
-                    {t.cap - t.sold} left of {t.cap}
+                    {left} left of {cap}
                   </span>
                 </div>
                 <div className="mt-2 h-1.5 rounded-full bg-border/60">

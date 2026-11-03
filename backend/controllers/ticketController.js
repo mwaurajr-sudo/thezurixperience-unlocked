@@ -1,4 +1,6 @@
 import { supabase } from "../config/db.js";
+import { getCurrentEvent } from "../config/event.js";
+import { buildTicketPass } from "../services/ticketService.js";
 
 /**
  * Verifies a ticket's validity and status.
@@ -24,16 +26,10 @@ export const verifyTicket = async (req, res, next) => {
         id,
         code,
         ticket_number,
-        email,
-        tier_name,
         quantity,
-        total_kes,
         event_vol,
         used,
-        created_at,
-        pdf_url,
-        payment_id,
-        event_id
+        created_at
       `)
       .eq("code", cleanCode)
       .maybeSingle();
@@ -48,17 +44,9 @@ export const verifyTicket = async (req, res, next) => {
       });
     }
 
-    // 2. Fetch associated event title if exists
-    let eventTitle = `Vol. ${ticket.event_vol}`;
-    if (ticket.event_id) {
-      const { data: event, error: eventErr } = await supabase
-        .from("events")
-        .select("title")
-        .eq("id", ticket.event_id)
-        .maybeSingle();
-      
-      if (event) eventTitle = event.title;
-    }
+    // 2. Resolve the current event title
+    const event = await getCurrentEvent();
+    const eventTitle = event.vol === ticket.event_vol ? event.title : `Vol. ${ticket.event_vol}`;
 
     // 3. Mark ticket as used if requested and not already used
     if (markUsed) {
@@ -71,11 +59,9 @@ export const verifyTicket = async (req, res, next) => {
           message: `REUSE BLOCKED: Ticket ${cleanCode} was already used.`,
           ticket: {
             code: ticket.code,
-            tierName: ticket.tier_name,
             quantity: ticket.quantity,
             eventVol: ticket.event_vol,
             eventTitle: eventTitle,
-            email: ticket.email,
             usedAt: ticket.created_at, // Or add used_at column if applicable
           },
         });
@@ -99,18 +85,49 @@ export const verifyTicket = async (req, res, next) => {
         : `TICKET VALID (UNUSED): Ticket ${cleanCode} is authentic and ready for check-in.`,
       ticket: {
         code: ticket.code,
-        tierName: ticket.tier_name,
         quantity: ticket.quantity,
         eventVol: ticket.event_vol,
         eventTitle: eventTitle,
-        email: ticket.email,
         used: ticket.used,
-        pdfUrl: ticket.pdf_url,
       },
     });
 
   } catch (error) {
     console.error("Ticket Verification Error:", error.message);
+    next(error);
+  }
+};
+
+/**
+ * Downloads a ticket's PDF pass.
+ *
+ * GET /api/tickets/pass/:ticketCode
+ */
+export const downloadPass = async (req, res, next) => {
+  const cleanCode = req.params.ticketCode.trim().toUpperCase();
+
+  try {
+    const { data: ticket, error } = await supabase
+      .from("tickets")
+      .select("code, quantity, event_vol, created_at")
+      .eq("code", cleanCode)
+      .maybeSingle();
+
+    if (error) throw error;
+
+    if (!ticket) {
+      return res.status(404).json({ success: false, message: `Ticket code ${cleanCode} does not exist.` });
+    }
+
+    const { pdfBuffer } = await buildTicketPass(ticket, await getCurrentEvent());
+
+    res.set({
+      "Content-Type": "application/pdf",
+      "Content-Disposition": `attachment; filename="Zuri-Pass-${ticket.code}.pdf"`,
+    });
+    return res.send(pdfBuffer);
+  } catch (error) {
+    console.error("Download Pass Error:", error.message);
     next(error);
   }
 };
