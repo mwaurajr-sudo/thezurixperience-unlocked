@@ -1,32 +1,23 @@
-import { Printer, CheckCircle2, Download } from "lucide-react";
+import { CheckCircle2, Download } from "lucide-react";
+import { BACKEND_URL } from "@/lib/backend";
 
 export interface DigitalTicketPassProps {
   code: string;
-  tierName?: string;
   quantity?: number;
   eventTitle?: string;
   eventDate?: string;
   venue?: string;
   email?: string;
-  totalKes?: number;
-  pdfUrl?: string;
 }
 
 export function DigitalTicketPass({
   code,
-  tierName = "General Entry",
   quantity = 1,
   eventTitle = "The Zuri Experience",
   eventDate = "Saturday, Dec 14",
-  venue = "Ruby Lounge",
+  venue = "Myra Residences, Kilimani",
   email,
-  totalKes,
-  pdfUrl,
 }: DigitalTicketPassProps) {
-  const handlePrint = () => {
-    window.print();
-  };
-
   return (
     <div className="relative mx-auto w-full max-w-md overflow-hidden rounded-xl border-2 border-primary/80 bg-black/95 p-6 font-mono text-primary shadow-[0_0_30px_rgba(191,46,38,0.25)] backdrop-blur-md">
       {/* Top Header Badge */}
@@ -57,14 +48,20 @@ export function DigitalTicketPass({
         </p>
 
         {/* Aesthetic Ticket Stub Barcode Lines */}
-        <div className="mt-4 flex items-center justify-center gap-[3px] py-1 opacity-75" aria-hidden="true">
-          {[4, 2, 6, 2, 4, 3, 2, 5, 2, 7, 3, 2, 4, 6, 2, 3, 5, 2, 4, 2, 6, 3, 2, 4, 5, 2, 3, 6, 2, 4].map((h, idx) => (
+        <div
+          className="mt-4 flex items-center justify-center gap-[3px] py-1 opacity-75"
+          aria-hidden="true"
+        >
+          {[
+            4, 2, 6, 2, 4, 3, 2, 5, 2, 7, 3, 2, 4, 6, 2, 3, 5, 2, 4, 2, 6, 3, 2, 4, 5, 2, 3, 6, 2,
+            4,
+          ].map((h, idx) => (
             <div
               key={idx}
               className="bg-primary"
               style={{
                 width: idx % 4 === 0 ? "3px" : idx % 2 === 0 ? "2px" : "1.5px",
-                height: `${22 + (h * 2)}px`,
+                height: `${22 + h * 2}px`,
               }}
             />
           ))}
@@ -74,8 +71,10 @@ export function DigitalTicketPass({
       {/* Details Grid */}
       <div className="space-y-2.5 rounded-lg border border-primary/20 bg-primary/5 p-4 text-xs">
         <div className="flex justify-between border-b border-primary/10 pb-1.5">
-          <span className="text-primary/60 uppercase tracking-[0.15em]">Pass Type:</span>
-          <span className="font-bold text-primary uppercase">{tierName} ({quantity} Guest{quantity > 1 ? "s" : ""})</span>
+          <span className="text-primary/60 uppercase tracking-[0.15em]">Pass:</span>
+          <span className="font-bold text-primary uppercase">
+            {quantity} Guest{quantity > 1 ? "s" : ""}
+          </span>
         </div>
         <div className="flex justify-between border-b border-primary/10 pb-1.5">
           <span className="text-primary/60 uppercase tracking-[0.15em]">Date & Time:</span>
@@ -91,34 +90,17 @@ export function DigitalTicketPass({
             <span className="font-bold text-primary truncate max-w-[180px]">{email}</span>
           </div>
         )}
-        {totalKes !== undefined && totalKes > 0 && (
-          <div className="flex justify-between pt-0.5">
-            <span className="text-primary/60 uppercase tracking-[0.15em]">Total Paid:</span>
-            <span className="font-bold text-primary">KES {totalKes.toLocaleString()}</span>
-          </div>
-        )}
       </div>
 
       {/* Actions */}
       <div className="mt-6 flex flex-wrap items-center justify-center gap-3 print:hidden">
-        <button
-          type="button"
-          onClick={handlePrint}
+        <a
+          href={`${BACKEND_URL}/api/tickets/pass/${encodeURIComponent(code)}`}
+          download
           className="flex flex-1 items-center justify-center gap-2 rounded border border-primary bg-primary px-4 py-2.5 text-xs font-bold uppercase tracking-[0.2em] text-black hover:bg-primary-glow transition-all"
         >
-          <Printer className="h-4 w-4" /> Save / Print Pass
-        </button>
-        {pdfUrl && (
-          <a
-            href={pdfUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            download
-            className="flex items-center justify-center gap-2 rounded border border-primary/40 px-4 py-2.5 text-xs font-bold uppercase tracking-[0.2em] text-primary hover:border-primary hover:bg-primary/10 transition-all"
-          >
-            <Download className="h-4 w-4" /> Download PDF
-          </a>
-        )}
+          <Download className="h-4 w-4" /> Save Pass
+        </a>
       </div>
 
       <p className="mt-4 text-center text-[9px] uppercase tracking-[0.2em] text-primary/50">

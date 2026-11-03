@@ -4,7 +4,7 @@ import PDFDocument from "pdfkit";
  * Generates a premium high-fashion PDF ticket voucher.
  * Matches the Wine & Black absolute dark-theme aesthetic of TheZuriXperience.
  *
- * @param {Object} data - Ticket details: { eventTitle, venue, eventDate, code, customerName, receiptNumber, amountPaid, purchaseDate }
+ * @param {Object} data - Ticket details: { eventTitle, venue, eventDate, code, quantity, eventVol, issuedDate }
  * @returns {Promise<Buffer>} PDF file binary buffer
  */
 export const generateTicketPDF = (data) => {
@@ -40,7 +40,7 @@ export const generateTicketPDF = (data) => {
       // 4. Ticket Left Section Content (x: 30 to 420)
       // Top Brand Header
       doc.font("Courier-Bold").fontSize(10).fillColor(primaryRed);
-      doc.text("★  THE ZURI XPERIENCE  ★", 30, 30, { characterSpacing: 2 });
+      doc.text("*  THE ZURI XPERIENCE  *", 30, 30, { characterSpacing: 2 });
 
       // Divider Line
       doc.moveTo(30, 48).lineTo(420, 48).lineWidth(0.5).stroke(primaryRed);
@@ -52,17 +52,12 @@ export const generateTicketPDF = (data) => {
 
       // Metadata details rows
       const details = [
-        { label: "CUSTOMER:", value: data.customerName || "N/A" },
         { label: "EVENT VOL:", value: data.eventVol || "01" },
-        { label: "VENUE:", value: data.venue || "Disclosed at door" },
+        { label: "VENUE:", value: data.venue || "Myra Residences, Kilimani" },
         { label: "DATE & TIME:", value: data.eventDate || "Saturday, December 14" },
-        data.amountPaid > 0
-          ? { label: "MPESA REF:", value: data.receiptNumber || "N/A" }
-          : { label: "ENTRY TYPE:", value: "DIRECT RSVP" },
-        data.amountPaid > 0
-          ? { label: "TOTAL PAID:", value: `KES ${Number(data.amountPaid).toLocaleString()}` }
-          : { label: "ACCESS:", value: "COMPLIMENTARY PASS" },
-        { label: "ISSUED:", value: data.purchaseDate || new Date().toISOString().split("T")[0] },
+        { label: "ENTRY TYPE:", value: "DIRECT RSVP" },
+        { label: "ACCESS:", value: "COMPLIMENTARY PASS" },
+        { label: "ISSUED:", value: data.issuedDate || new Date().toISOString().split("T")[0] },
       ];
 
       let yPos = 90;
@@ -89,14 +84,9 @@ export const generateTicketPDF = (data) => {
 
       // Stub details list
       doc.font("Courier").fontSize(8).fillColor(textGrey);
-      doc.text("PASS CATEGORY:", 455, 115);
+      doc.text("ADMITTANCE:", 455, 115);
       doc.font("Courier-Bold").fontSize(9).fillColor(textWhite);
-      doc.text((data.tierName || "General").toUpperCase(), 455, 127);
-
-      doc.font("Courier").fontSize(8).fillColor(textGrey);
-      doc.text("ADMITTANCE:", 455, 150);
-      doc.font("Courier-Bold").fontSize(9).fillColor(textWhite);
-      doc.text(`${data.quantity || 1} GUEST(S)`, 455, 162);
+      doc.text(`${data.quantity || 1} GUEST(S)`, 455, 127);
 
       // Vertical Barcode aesthetic using simple tall rectangle lines
       let barX = 460;

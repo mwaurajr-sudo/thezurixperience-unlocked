@@ -62,6 +62,57 @@ export type Database = {
         }
         Relationships: []
       }
+      rsvps: {
+        Row: {
+          confirmed_at: string | null
+          created_at: string
+          email: string
+          event_vol: string
+          full_name: string | null
+          id: string
+          last_email_at: string | null
+          quantity: number
+          status: string
+          ticket_emailed_at: string | null
+          tier_name: string
+          token_expires_at: string
+          token_hash: string
+          user_id: string | null
+        }
+        Insert: {
+          confirmed_at?: string | null
+          created_at?: string
+          email: string
+          event_vol: string
+          full_name?: string | null
+          id?: string
+          last_email_at?: string | null
+          quantity?: number
+          status?: string
+          ticket_emailed_at?: string | null
+          tier_name: string
+          token_expires_at: string
+          token_hash: string
+          user_id?: string | null
+        }
+        Update: {
+          confirmed_at?: string | null
+          created_at?: string
+          email?: string
+          event_vol?: string
+          full_name?: string | null
+          id?: string
+          last_email_at?: string | null
+          quantity?: number
+          status?: string
+          ticket_emailed_at?: string | null
+          tier_name?: string
+          token_expires_at?: string
+          token_hash?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       tickets: {
         Row: {
           code: string
@@ -69,11 +120,9 @@ export type Database = {
           email: string
           event_vol: string
           id: string
-          payment_method: string
           quantity: number
           ticket_number: number
           tier_name: string
-          total_kes: number
           user_id: string | null
         }
         Insert: {
@@ -82,11 +131,9 @@ export type Database = {
           email: string
           event_vol: string
           id?: string
-          payment_method: string
           quantity: number
           ticket_number: number
           tier_name: string
-          total_kes: number
           user_id?: string | null
         }
         Update: {
@@ -95,11 +142,9 @@ export type Database = {
           email?: string
           event_vol?: string
           id?: string
-          payment_method?: string
           quantity?: number
           ticket_number?: number
           tier_name?: string
-          total_kes?: number
           user_id?: string | null
         }
         Relationships: []

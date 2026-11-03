@@ -21,7 +21,6 @@ export interface EventDetails {
 
 export interface TicketTier {
   name: string;
-  price: number;
   cap: number;
   sold: number;
   perks: string;
@@ -108,8 +107,8 @@ const defaultContent: SiteContent = {
     tags: "RnB Nights, Vol. 01, Nairobi, Members Only, Limited Capacity, Dress to Burn",
     date: "Saturday, December 14",
     doors: "9:00 PM — 4:00 AM",
-    venue: "",
-    locMode: "secret",
+    venue: "Myra Residences, Kilimani",
+    locMode: "full",
     dress: "Wine & black",
     dresslbl: "Dress to Burn",
     dj1: "",
@@ -118,9 +117,7 @@ const defaultContent: SiteContent = {
     lineupMode: "secret",
   },
   tickets: [
-    { name: "General", price: 2500, cap: 120, sold: 74, perks: "Entry after 10 PM, Welcome drink" },
-    { name: "VIP", price: 6000, cap: 40, sold: 28, perks: "Priority entry, Reserved standing, Two welcome drinks" },
-    { name: "Table (4)", price: 28000, cap: 10, sold: 7, perks: "Reserved table, Bottle service, Private host" },
+    { name: "Pass", cap: 99, sold: 0, perks: "" },
   ],
   ticketTagline: "Capacity is intentionally small. Once a tier is gone, it's gone.",
   ticketSoldOut: "This chapter is full. Join the waitlist.",

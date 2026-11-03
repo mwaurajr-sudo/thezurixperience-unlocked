@@ -13,7 +13,7 @@ if (!supabaseUrl || !supabaseServiceKey) {
 
 // Initializing the administrative Supabase client using the service role key.
 // This allows the backend to perform elevated operations (e.g. PDF ticket upload to storage,
-// inserting user and payment records, and sequential sequence fetches) while bypassing RLS.
+// inserting RSVP and ticket records) while bypassing RLS.
 export const supabase = createClient(supabaseUrl, supabaseServiceKey, {
   auth: {
     persistSession: false,

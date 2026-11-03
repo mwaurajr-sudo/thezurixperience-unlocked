@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAdminContent, type TicketTier } from "@/contexts/AdminContentContext";
+import { supabase } from "@/integrations/supabase/client";
 import {
   PanelHeader,
   SectionCard,
@@ -39,7 +40,7 @@ function TierCard({
           <div>
             <div className="font-medium">{tier.name}</div>
             <div className="text-xs text-muted-foreground">
-              KES {tier.price.toLocaleString()} · {left} of {tier.cap} left ({pct}% sold)
+              {left} of {tier.cap} left ({pct}% claimed)
             </div>
           </div>
         </div>
@@ -51,18 +52,11 @@ function TierCard({
 
       {expanded && (
         <div className="border-t border-border/60 px-5 pb-5 pt-4 space-y-4">
-          <TwoCol>
-            <TextField
-              label="Tier name"
-              value={tier.name}
-              onChange={(v) => onChange({ ...tier, name: v })}
-            />
-            <NumberField
-              label="Price (KES)"
-              value={tier.price}
-              onChange={(v) => onChange({ ...tier, price: v })}
-            />
-          </TwoCol>
+          <TextField
+            label="Tier name"
+            value={tier.name}
+            onChange={(v) => onChange({ ...tier, name: v })}
+          />
           <TwoCol>
             <NumberField
               label="Total capacity"
@@ -70,7 +64,7 @@ function TierCard({
               onChange={(v) => onChange({ ...tier, cap: v })}
             />
             <NumberField
-              label="Tickets sold"
+              label="Passes claimed"
               value={tier.sold}
               onChange={(v) => onChange({ ...tier, sold: v })}
             />
@@ -100,6 +94,80 @@ function TierCard({
   );
 }
 
+type RsvpRow = {
+  id: string;
+  full_name: string | null;
+  email: string;
+  tier_name: string;
+  quantity: number;
+  status: string;
+  ticket_emailed_at: string | null;
+  tickets: { code: string } | null;
+};
+
+function RsvpList() {
+  const [rows, setRows] = useState<RsvpRow[] | null>(null);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    supabase
+      .from("rsvps")
+      .select("id, full_name, email, tier_name, quantity, status, ticket_emailed_at, tickets(code)")
+      .order("created_at", { ascending: false })
+      .then(({ data, error }) => {
+        if (error) setFailed(true);
+        else setRows(data as unknown as RsvpRow[]);
+      });
+  }, []);
+
+  if (failed) return <p className="text-sm text-muted-foreground">Could not load RSVPs.</p>;
+  if (!rows) return <p className="text-sm text-muted-foreground">Loading RSVPs...</p>;
+  if (rows.length === 0) return <p className="text-sm text-muted-foreground">No RSVPs yet.</p>;
+
+  const confirmed = rows.filter((r) => r.status === "confirmed").length;
+
+  return (
+    <div className="space-y-3">
+      <p className="text-xs text-muted-foreground">
+        {rows.length} RSVPs · {confirmed} confirmed
+      </p>
+      <div className="overflow-x-auto">
+        <table className="w-full text-left text-sm">
+          <thead className="text-xs text-muted-foreground">
+            <tr>
+              <th className="py-2 pr-4 font-medium">Guest</th>
+              <th className="py-2 pr-4 font-medium">Pass</th>
+              <th className="py-2 pr-4 font-medium">Status</th>
+              <th className="py-2 font-medium">Ticket</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r.id} className="border-t border-border/60">
+                <td className="py-2 pr-4">
+                  <div>{r.full_name}</div>
+                  <div className="text-xs text-muted-foreground">{r.email}</div>
+                </td>
+                <td className="py-2 pr-4">
+                  {r.tier_name} × {r.quantity}
+                </td>
+                <td className="py-2 pr-4">
+                  {r.status === "confirmed" ? "Confirmed" : "Awaiting confirmation"}
+                </td>
+                <td className="py-2">
+                  {r.tickets
+                    ? `${r.tickets.code}${r.ticket_emailed_at ? "" : " (email not sent)"}`
+                    : "—"}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 export function TicketsPanel() {
   const { content, setContent, saveSection } = useAdminContent();
 
@@ -116,19 +184,24 @@ export function TicketsPanel() {
   const addTier = () =>
     setContent((c) => ({
       ...c,
-      tickets: [...c.tickets, { name: "New tier", price: 0, cap: 50, sold: 0, perks: "" }],
+      tickets: [...c.tickets, { name: "New tier", cap: 50, sold: 0, perks: "" }],
     }));
 
   const save = async () => {
     try {
       await saveSection(["tickets", "ticketTagline", "ticketSoldOut"]);
       toast.success("Ticket tiers saved.");
-    } catch { /* handled */ }
+    } catch {
+      /* handled */
+    }
   };
 
   return (
     <div className="space-y-6">
-      <PanelHeader title="Tickets & Pricing" description="Manage ticket tiers, pricing, capacity and perks." />
+      <PanelHeader
+        title="Tickets & RSVPs"
+        description="Manage ticket tiers, capacity and perks, and see who has RSVP'd."
+      />
 
       <SectionCard title="Ticket tiers">
         <div className="space-y-3">
@@ -142,14 +215,13 @@ export function TicketsPanel() {
             />
           ))}
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          className="mt-2 rounded-full text-xs"
-          onClick={addTier}
-        >
+        <Button variant="outline" size="sm" className="mt-2 rounded-full text-xs" onClick={addTier}>
           <Plus className="mr-1 h-3.5 w-3.5" /> Add tier
         </Button>
+      </SectionCard>
+
+      <SectionCard title="RSVPs">
+        <RsvpList />
       </SectionCard>
 
       <SectionCard title="Page copy">
@@ -165,7 +237,10 @@ export function TicketsPanel() {
         />
       </SectionCard>
 
-      <Button className="rounded-full bg-primary px-8 text-primary-foreground hover:bg-primary/90" onClick={save}>
+      <Button
+        className="rounded-full bg-primary px-8 text-primary-foreground hover:bg-primary/90"
+        onClick={save}
+      >
         Save changes
       </Button>
     </div>

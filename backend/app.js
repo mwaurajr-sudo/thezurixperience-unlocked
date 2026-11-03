@@ -13,10 +13,13 @@ dotenv.config();
 import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
 
 // Import router files
-import paymentRoutes from "./routes/paymentRoutes.js";
+import rsvpRoutes from "./routes/rsvpRoutes.js";
 import ticketRoutes from "./routes/ticketRoutes.js";
 
 const app = express();
+
+// Render and Vercel sit one proxy in front of us; rate limiting needs the real client IP
+app.set("trust proxy", 1);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -76,7 +79,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Dynamic routes registration
-app.use("/api/payments", paymentRoutes);
+app.use("/api/rsvp", rsvpRoutes);
 app.use("/api/tickets", ticketRoutes);
 
 // Health check endpoint
