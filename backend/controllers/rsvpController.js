@@ -1,10 +1,11 @@
 import crypto from "crypto";
 import { supabase } from "../config/db.js";
-import { getCurrentEvent } from "../config/event.js";
+import { getCurrentEvent, getSiteUrl } from "../config/event.js";
 import { sendRsvpEmail } from "../services/emailService.js";
 import {
   deliverTicket,
   findTicketForRsvp,
+  getPassesLeft,
   issueTicketForRsvp,
 } from "../services/ticketService.js";
 import { validateEmail } from "../utils/validators.js";
@@ -22,11 +23,6 @@ const RSVP_RECEIVED = {
 
 const hashToken = (token) => crypto.createHash("sha256").update(token).digest("hex");
 
-const getSiteUrl = () =>
-  (process.env.PUBLIC_SITE_URL || (process.env.FRONTEND_URL || "http://localhost:8080").split(",")[0])
-    .trim()
-    .replace(/\/$/, "");
-
 /**
  * Resolves the signed-in user from the bearer token, if one was sent.
  */
@@ -35,6 +31,20 @@ const resolveUserId = async (req) => {
   if (!token) return null;
   const { data, error } = await supabase.auth.getUser(token);
   return error ? null : data.user?.id ?? null;
+};
+
+/**
+ * Returns how many passes are left.
+ *
+ * GET /api/rsvp/availability
+ */
+export const getAvailability = async (req, res, next) => {
+  try {
+    return res.status(200).json({ success: true, ...(await getPassesLeft()) });
+  } catch (error) {
+    console.error("Availability Error:", error.message);
+    next(error);
+  }
 };
 
 /**
@@ -138,7 +148,7 @@ export const createRsvp = async (req, res, next) => {
 };
 
 /**
- * Confirms attendance, issues the ticket and emails it from the ticket address.
+ * Confirms attendance, issues the ticket and emails it.
  * This is a POST sent by a button on the confirm page: mail scanners open links in
  * emails automatically, which would confirm guests who never clicked if this were a GET.
  * Safe to repeat: it returns the same ticket, and retries the email if it hasn't gone out.

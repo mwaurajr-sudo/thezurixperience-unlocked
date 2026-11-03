@@ -5,6 +5,7 @@ const DEFAULT_EVENT = {
   vol: "01",
   name: "RnB Nights",
   date: "Saturday, December 14",
+  doors: "9:00 PM — 4:00 AM",
   venue: "Myra Residences, Kilimani",
 };
 const DEFAULT_TIER_NAMES = ["Pass"];
@@ -13,7 +14,7 @@ const DEFAULT_TIER_NAMES = ["Pass"];
  * Loads the current event and tier names from site_content. Emails are sent to whatever
  * address a visitor types, so event details must come from here and never from the request.
  *
- * @returns {Promise<Object>} { vol, title, date, venue, tierNames }
+ * @returns {Promise<Object>} { vol, title, date, doors, venue, tierNames }
  */
 export const getCurrentEvent = async () => {
   const { data, error } = await supabase
@@ -31,7 +32,16 @@ export const getCurrentEvent = async () => {
     vol: event.vol,
     title: event.name,
     date: event.date,
+    doors: event.doors,
     venue: event.venue || DEFAULT_EVENT.venue,
     tierNames: tiers,
   };
 };
+
+/**
+ * The public site address used for links in emails.
+ */
+export const getSiteUrl = () =>
+  (process.env.PUBLIC_SITE_URL || process.env.RENDER_EXTERNAL_URL || (process.env.FRONTEND_URL || "http://localhost:8080").split(",")[0])
+    .trim()
+    .replace(/\/$/, "");

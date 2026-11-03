@@ -1,26 +1,24 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import { AuthGate } from "@/components/AuthGate";
 import { SiteHeader } from "@/components/SiteHeader";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePassesLeft } from "@/hooks/usePassesLeft";
 import { useSiteContent, type TicketTier } from "@/hooks/useSiteContent";
 import { DigitalTicketPass, type DigitalTicketPassProps } from "@/components/DigitalTicketPass";
 import { BACKEND_URL } from "@/lib/backend";
 import { Search, X, Mail, Ticket } from "lucide-react";
 
 export const Route = createFileRoute("/rsvp")({
-  component: () => (
-    <AuthGate>
-      <RsvpPage />
-    </AuthGate>
-  ),
+  // Public: invited guests open this from their email and may not have an account.
+  component: RsvpPage,
   head: () => ({ meta: [{ title: "RSVP — TheZuriXperience" }] }),
 });
 
 function RsvpPage() {
   const { content, loading } = useSiteContent();
   const { user, session } = useAuth();
+  const passes = usePassesLeft();
   const e = content.event;
 
   const [qty, setQty] = useState<Record<string, number>>({});
@@ -112,7 +110,7 @@ function RsvpPage() {
 
   return (
     <div className="min-h-screen bg-black text-primary font-mono">
-      <SiteHeader />
+      {user && <SiteHeader />}
       <main className="mx-auto max-w-3xl px-5 py-16">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
@@ -200,8 +198,9 @@ function RsvpPage() {
         ) : (
           <div className="mt-10 space-y-4">
             {content.tickets.map((t) => {
-              const left = t.cap - t.sold;
-              const pct = t.cap > 0 ? Math.round((t.sold / t.cap) * 100) : 0;
+              const left = passes?.left ?? t.cap - t.sold;
+              const total = passes?.total ?? t.cap;
+              const pct = total > 0 ? Math.round(((total - left) / total) * 100) : 0;
               const soldOut = left <= 0;
               const count = qty[t.name] ?? 1;
 
@@ -356,11 +355,13 @@ function RsvpPage() {
           </div>
         )}
 
-        <div className="mt-10 text-xs uppercase tracking-[0.3em]">
-          <Link to="/event" className="text-primary/70 hover:text-primary">
-            ← Back to event
-          </Link>
-        </div>
+        {user && (
+          <div className="mt-10 text-xs uppercase tracking-[0.3em]">
+            <Link to="/event" className="text-primary/70 hover:text-primary">
+              ← Back to event
+            </Link>
+          </div>
+        )}
       </main>
     </div>
   );

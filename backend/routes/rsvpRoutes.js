@@ -1,6 +1,6 @@
 import express from "express";
 import rateLimit from "express-rate-limit";
-import { createRsvp, confirmRsvp } from "../controllers/rsvpController.js";
+import { createRsvp, confirmRsvp, getAvailability } from "../controllers/rsvpController.js";
 
 const router = express.Router();
 
@@ -13,6 +13,10 @@ const rsvpLimiter = rateLimit({
   legacyHeaders: false,
   message: { success: false, message: "Too many RSVP attempts. Please try again later." },
 });
+
+// Route to read how many passes are left
+// GET /api/rsvp/availability
+router.get("/availability", getAvailability);
 
 // Route to record an RSVP and email the confirmation link
 // POST /api/rsvp

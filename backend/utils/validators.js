@@ -6,6 +6,6 @@
  */
 export const validateEmail = (email) => {
   if (!email) return false;
-  const re = /^\S+@\S+\.\S+$/;
+  const re = /^[^\s@,;<>]+@[^\s@,;<>]+\.[^\s@,;<>]+$/;
   return re.test(String(email).trim().toLowerCase());
 };

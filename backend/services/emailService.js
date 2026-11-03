@@ -119,10 +119,41 @@ const buildTicketTemplate = (data) =>
   });
 
 /**
- * Reads one sender's settings. RSVP and ticket emails each have their own account,
- * and neither falls back to the other, so a ticket never goes out from the RSVP address.
+ * Event invite: the event details, the RSVP link and how to get a ticket.
  *
- * @param {string} prefix - Environment variable prefix ("EMAIL" or "TICKET_EMAIL")
+ * @param {Object} data - { eventTitle, eventDate, doors, venue, rsvpUrl }
+ * @returns {string} HTML body
+ */
+const buildInviteTemplate = (data) =>
+  buildLayout({
+    title: "You're Invited",
+    subtitle: "You're invited",
+    body: `
+      ${paragraph(`
+        You're invited to <strong style="color:${TEXT_WHITE};">${escapeHtml(data.eventTitle.toUpperCase())}</strong>. Entry is complimentary, but you need a ticket to get in.
+      `)}
+      <div style="background-color:${BOX_BG};border:1px dashed ${PRIMARY_RED};padding:20px;margin-bottom:25px;">
+        ${detailRow("EVENT", data.eventTitle.toUpperCase())}
+        ${detailRow("DATE", data.eventDate)}
+        ${detailRow("TIME", data.doors)}
+        ${detailRow("VENUE", data.venue)}
+      </div>
+      <a href="${escapeHtml(data.rsvpUrl)}" style="display:block;text-align:center;background-color:${PRIMARY_RED};color:#000000;padding:14px;text-decoration:none;font-size:12px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin-bottom:25px;">RSVP Now →</a>
+      ${paragraph(`
+        <strong style="color:${TEXT_WHITE};">How to RSVP and get your ticket:</strong><br>
+        1. Press <strong>RSVP Now</strong> above, or open this link: <a href="${escapeHtml(data.rsvpUrl)}" style="color:${PRIMARY_RED};">${escapeHtml(data.rsvpUrl)}</a><br>
+        2. Press <strong>RSVP</strong> on the page, enter your name and email, then press <strong>Send RSVP</strong>. You don't need an account.<br>
+        3. Look for an email from <strong>Zuri</strong> and press <strong>Confirm Attendance</strong>. Check your spam folder if you don't see it.<br>
+        4. Your ticket arrives by email as a PDF. Save it and show your pass code at the door.
+      `)}
+    `,
+  });
+
+/**
+ * Reads one sender's settings. Invites have their own account and never fall back to
+ * the one that handles RSVP and ticket emails.
+ *
+ * @param {string} prefix - Environment variable prefix ("EMAIL" or "INVITE_EMAIL")
  */
 const readSender = (prefix) => {
   const user = process.env[`${prefix}_USER`];
@@ -216,7 +247,7 @@ const dispatch = async (sender, { to, subject, html, attachments = [] }) => {
 };
 
 /**
- * Sends the "confirm your attendance" email from the RSVP address (EMAIL_*).
+ * Sends the "confirm your attendance" email from the main address (EMAIL_*).
  *
  * @param {string} toEmail - Guest email address
  * @param {Object} data - RSVP and event details, including confirmUrl
@@ -229,14 +260,14 @@ export const sendRsvpEmail = (toEmail, data) =>
   });
 
 /**
- * Sends the ticket with its PDF attached from the ticket address (TICKET_EMAIL_*).
+ * Sends the ticket with its PDF attached from the main address (EMAIL_*).
  *
  * @param {string} toEmail - Guest email address
  * @param {Object} ticketData - Ticket and event details
  * @param {Buffer} pdfBuffer - Generated PDF binary buffer
  */
 export const sendTicketEmail = (toEmail, ticketData, pdfBuffer) =>
-  dispatch(readSender("TICKET_EMAIL"), {
+  dispatch(readSender("EMAIL"), {
     to: toEmail,
     subject: `Your ticket: ${ticketData.code} — TheZuriXperience`,
     html: buildTicketTemplate(ticketData),
@@ -247,4 +278,17 @@ export const sendTicketEmail = (toEmail, ticketData, pdfBuffer) =>
         contentType: "application/pdf",
       },
     ],
+  });
+
+/**
+ * Sends the event invite from the invite address (INVITE_EMAIL_*).
+ *
+ * @param {string} toEmail - Guest email address
+ * @param {Object} data - Event details and rsvpUrl
+ */
+export const sendInviteEmail = (toEmail, data) =>
+  dispatch(readSender("INVITE_EMAIL"), {
+    to: toEmail,
+    subject: `You're invited: ${data.eventTitle}`,
+    html: buildInviteTemplate(data),
   });

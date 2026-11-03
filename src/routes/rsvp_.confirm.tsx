@@ -65,7 +65,7 @@ function ConfirmRsvpPage() {
               </h1>
               <p className="mt-2 text-xs text-primary/70">
                 {emailSent
-                  ? `Your ticket has been sent to ${pass.email}. It comes from a separate address, so check your spam folder if you don't see it.`
+                  ? `Your ticket has been sent to ${pass.email}. Check your spam folder if you don't see it.`
                   : "Your ticket is below, but we couldn't email it just now. Save this pass, or open your confirmation link again later to retry."}
               </p>
             </div>

@@ -62,6 +62,36 @@ export type Database = {
         }
         Relationships: []
       }
+      invites: {
+        Row: {
+          created_at: string
+          email: string
+          event_vol: string
+          id: string
+          last_error: string | null
+          sent_at: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          event_vol: string
+          id?: string
+          last_error?: string | null
+          sent_at?: string | null
+          status: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          event_vol?: string
+          id?: string
+          last_error?: string | null
+          sent_at?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       rsvps: {
         Row: {
           confirmed_at: string | null

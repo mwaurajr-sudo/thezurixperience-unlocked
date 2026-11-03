@@ -22,6 +22,16 @@ const nextTicketNumber = async () => {
   return data[0].ticket_number > 1 ? data[0].ticket_number - 1 : null;
 };
 
+/**
+ * Counts down with the ticket codes: 99 before the first ticket, 98 after ZURI099, and so on.
+ *
+ * @returns {Promise<{ left: number, total: number }>}
+ */
+export const getPassesLeft = async () => ({
+  left: (await nextTicketNumber()) ?? 0,
+  total: MAX_TICKET_NUMBER,
+});
+
 export const findTicketForRsvp = async (rsvpId) => {
   const { data, error } = await supabase
     .from("tickets")
@@ -98,7 +108,7 @@ export const buildTicketPass = async (ticket, event) => {
 };
 
 /**
- * Emails the PDF pass from the ticket address to the email the guest RSVP'd with.
+ * Emails the PDF pass to the email the guest RSVP'd with.
  *
  * @param {Object} rsvp - Row from public.rsvps
  * @param {Object} ticket - Row from public.tickets
