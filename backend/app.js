@@ -42,6 +42,10 @@ const rawFrontendUrls = (process.env.FRONTEND_URL || "http://localhost:5173")
 
 const allowedOrigins = new Set([
   ...rawFrontendUrls,
+  // The site's own address: browsers send it as the origin on POST requests, even from the same site
+  ...[process.env.PUBLIC_SITE_URL, process.env.RENDER_EXTERNAL_URL]
+    .filter(Boolean)
+    .map((url) => url.trim().replace(/\/$/, "")),
   "https://thezurixperience-unlocked.vercel.app",
   "http://localhost:3000",
   "http://localhost:5173",
