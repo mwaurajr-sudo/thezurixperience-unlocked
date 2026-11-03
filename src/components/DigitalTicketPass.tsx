@@ -15,7 +15,7 @@ export function DigitalTicketPass({
   quantity = 1,
   eventTitle = "The Zuri Experience",
   eventDate = "6th November",
-  venue = "On your ticket email",
+  venue = "On your saved pass",
   email,
 }: DigitalTicketPassProps) {
   return (

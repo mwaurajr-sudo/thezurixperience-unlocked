@@ -24,6 +24,16 @@ const RSVP_RECEIVED = {
 
 const hashToken = (token) => crypto.createHash("sha256").update(token).digest("hex");
 
+// The ticket shown on screen, including the venue.
+const ticketPayload = (ticket, event) => ({
+  code: ticket.code,
+  quantity: ticket.quantity,
+  eventTitle: event.title,
+  eventDate: event.date,
+  venue: event.venue,
+  email: ticket.email,
+});
+
 /**
  * Resolves the signed-in user from the bearer token, if one was sent.
  */
@@ -49,7 +59,8 @@ export const getAvailability = async (req, res, next) => {
 };
 
 /**
- * Records an RSVP and emails the guest a link to confirm their attendance.
+ * Records an RSVP. By default the ticket comes straight back to show on screen, with no email.
+ * With REQUIRE_EMAIL_CONFIRMATION=true, it instead emails the guest a link to confirm their attendance.
  * If the guest already has a ticket, it is re-sent instead.
  *
  * POST /api/rsvp
@@ -78,6 +89,53 @@ export const createRsvp = async (req, res, next) => {
 
     if (existingErr) throw existingErr;
 
+    const saveRsvp = async () => {
+      const token = crypto.randomBytes(32).toString("base64url");
+      const fullName = String(customerName || "").trim().slice(0, MAX_NAME_LENGTH) || cleanEmail.split("@")[0];
+      const userId = await resolveUserId(req);
+
+      const { data: rsvp, error: upsertErr } = await supabase
+        .from("rsvps")
+        .upsert(
+          {
+            email: cleanEmail,
+            full_name: fullName,
+            tier_name: tierName,
+            quantity: GUESTS_PER_PASS,
+            event_vol: event.vol,
+            user_id: userId ?? existing?.user_id ?? null,
+            token_hash: hashToken(token),
+            token_expires_at: new Date(Date.now() + TOKEN_LIFETIME_MS).toISOString(),
+          },
+          { onConflict: "email,event_vol" }
+        )
+        .select("*")
+        .single();
+
+      if (upsertErr) throw upsertErr;
+      return { rsvp, token, fullName };
+    };
+
+    if (process.env.REQUIRE_EMAIL_CONFIRMATION !== "true") {
+      // Entering the same email again brings back the same ticket, so a lost pass can be recovered.
+      let ticket = existing ? await findTicketForRsvp(existing.id) : null;
+      const alreadyRsvpd = Boolean(ticket);
+
+      if (!ticket) {
+        const { rsvp } = await saveRsvp();
+        ticket = await issueTicketForRsvp(rsvp);
+        if (!ticket) {
+          return res.status(409).json({ success: false, message: "Sorry, all passes have been claimed." });
+        }
+        await supabase
+          .from("rsvps")
+          .update({ status: "confirmed", confirmed_at: new Date().toISOString() })
+          .eq("id", rsvp.id);
+      }
+
+      return res.status(200).json({ success: true, alreadyRsvpd, ticket: ticketPayload(ticket, event) });
+    }
+
     if (existing?.last_email_at && Date.now() - new Date(existing.last_email_at).getTime() < EMAIL_COOLDOWN_MS) {
       return res.status(200).json(RSVP_RECEIVED);
     }
@@ -92,29 +150,7 @@ export const createRsvp = async (req, res, next) => {
       return res.status(200).json(RSVP_RECEIVED);
     }
 
-    const fullName = String(customerName || "").trim().slice(0, MAX_NAME_LENGTH) || cleanEmail.split("@")[0];
-    const token = crypto.randomBytes(32).toString("base64url");
-    const userId = await resolveUserId(req);
-
-    const { data: rsvp, error: upsertErr } = await supabase
-      .from("rsvps")
-      .upsert(
-        {
-          email: cleanEmail,
-          full_name: fullName,
-          tier_name: tierName,
-          quantity: GUESTS_PER_PASS,
-          event_vol: event.vol,
-          user_id: userId ?? existing?.user_id ?? null,
-          token_hash: hashToken(token),
-          token_expires_at: new Date(Date.now() + TOKEN_LIFETIME_MS).toISOString(),
-        },
-        { onConflict: "email,event_vol" }
-      )
-      .select("*")
-      .single();
-
-    if (upsertErr) throw upsertErr;
+    const { rsvp, token, fullName } = await saveRsvp();
 
     try {
       await sendRsvpEmail(cleanEmail, {
@@ -210,14 +246,7 @@ export const confirmRsvp = async (req, res, next) => {
       success: true,
       alreadyConfirmed,
       emailSent,
-      ticket: {
-        code: ticket.code,
-        quantity: ticket.quantity,
-        eventTitle: event.title,
-        eventDate: event.date,
-        venue: event.venue,
-        email: ticket.email,
-      },
+      ticket: ticketPayload(ticket, event),
     });
   } catch (error) {
     console.error("Confirm RSVP Error:", error.message);

@@ -4,6 +4,8 @@ Node.js + Express backend for guest RSVPs, ticket issuing, PDF passes and email 
 
 ## How an RSVP works
 
+By default the guest's ticket appears on screen straight after they RSVP, with no email sent, and entering the same email again brings it back. Set `REQUIRE_EMAIL_CONFIRMATION=true` to use the emailed flow below.
+
 1. An admin pastes guest emails under **Tickets & RSVPs** and sends invites: `POST /api/invites`. They go out from the **invite sender** (`INVITE_EMAIL_*`) with the RSVP link and instructions.
 2. The guest enters their email on the public `/rsvp` page, with no account needed: `POST /api/rsvp`.
 3. They automatically get an email from the **main sender** (`EMAIL_*`) with a link to `/rsvp/confirm`.

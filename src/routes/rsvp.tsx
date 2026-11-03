@@ -7,7 +7,7 @@ import { usePassesLeft } from "@/hooks/usePassesLeft";
 import { useSiteContent, type TicketTier } from "@/hooks/useSiteContent";
 import { DigitalTicketPass, type DigitalTicketPassProps } from "@/components/DigitalTicketPass";
 import { BACKEND_URL } from "@/lib/backend";
-import { Search, X, Mail, Ticket } from "lucide-react";
+import { CheckCircle2, Search, X, Mail, Ticket } from "lucide-react";
 
 export const Route = createFileRoute("/rsvp")({
   // Public: invited guests open this from their email and may not have an account.
@@ -18,7 +18,6 @@ export const Route = createFileRoute("/rsvp")({
 function RsvpPage() {
   const { content, loading } = useSiteContent();
   const { user, session } = useAuth();
-  const passes = usePassesLeft();
   const e = content.event;
 
   const [lookupQuery, setLookupQuery] = useState("");
@@ -31,6 +30,8 @@ function RsvpPage() {
   const [rsvpName, setRsvpName] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submittedEmail, setSubmittedEmail] = useState<string | null>(null);
+  const [issuedPass, setIssuedPass] = useState<DigitalTicketPassProps | null>(null);
+  const passes = usePassesLeft(issuedPass?.code);
 
   const handleLookupPass = async () => {
     if (!lookupQuery.trim()) {
@@ -93,7 +94,11 @@ function RsvpPage() {
         throw new Error(data.message || "Could not record your RSVP");
       }
 
-      setSubmittedEmail(rsvpEmail.trim());
+      if (data.ticket) {
+        setIssuedPass(data.ticket);
+      } else {
+        setSubmittedEmail(rsvpEmail.trim());
+      }
       setActiveClaimTier(null);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err: any) {
@@ -138,6 +143,25 @@ function RsvpPage() {
             </button>
           </div>
         </div>
+
+        {/* Ticket Issued Section */}
+        {issuedPass && (
+          <section className="mt-10 rounded-xl border-2 border-primary bg-black/95 p-6 relative animate-fade-in shadow-[0_0_40px_rgba(191,46,38,0.3)]">
+            <div className="mb-6 text-center">
+              <div className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs uppercase tracking-[0.25em] text-primary font-bold">
+                <CheckCircle2 className="h-3.5 w-3.5" /> You're on the list
+              </div>
+              <h2 className="mt-2 text-xl font-bold uppercase tracking-[0.2em] text-primary">
+                This is your ticket
+              </h2>
+              <p className="mt-2 text-xs leading-relaxed text-primary/70">
+                Press Save Pass to keep it on your phone, and show it at the door. It won't be
+                emailed. If you lose it, RSVP again with the same email to get it back.
+              </p>
+            </div>
+            <DigitalTicketPass {...issuedPass} />
+          </section>
+        )}
 
         {/* RSVP Received Section */}
         {submittedEmail && (
@@ -301,8 +325,8 @@ function RsvpPage() {
                 </div>
 
                 <div className="rounded border border-primary/20 bg-primary/5 p-3 text-[11px] leading-relaxed text-primary/70">
-                  ★ We'll email you a link to confirm your attendance. Once you confirm, your ticket
-                  arrives in a separate email.
+                  ★ Your ticket, with the venue, appears on the next screen. Save it and show it at
+                  the door.
                 </div>
               </div>
 
@@ -320,10 +344,18 @@ function RsvpPage() {
                   disabled={submitting}
                   className="flex-1 border border-primary bg-primary px-4 py-2.5 text-xs font-bold uppercase tracking-[0.25em] text-black hover:bg-primary-glow disabled:opacity-50 transition-all"
                 >
-                  {submitting ? "Sending..." : "Send RSVP →"}
+                  {submitting ? "Getting your ticket..." : "Get My Ticket →"}
                 </button>
               </div>
             </div>
+          </div>
+        )}
+
+        {!user && (
+          <div className="mt-10 text-xs uppercase tracking-[0.3em]">
+            <Link to="/" className="text-primary/70 hover:text-primary">
+              Sign up or sign in →
+            </Link>
           </div>
         )}
 

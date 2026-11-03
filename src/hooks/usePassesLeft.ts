@@ -7,7 +7,8 @@ export interface PassesLeft {
 }
 
 // Live count from the backend. Goes down each time a guest confirms and a ticket is issued.
-export function usePassesLeft() {
+// Pass a value that changes to read the count again, such as a newly issued ticket's code.
+export function usePassesLeft(refreshKey?: string) {
   const [passes, setPasses] = useState<PassesLeft | null>(null);
 
   useEffect(() => {
@@ -23,7 +24,7 @@ export function usePassesLeft() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [refreshKey]);
 
   return passes;
 }
