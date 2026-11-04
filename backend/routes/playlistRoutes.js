@@ -14,7 +14,7 @@ const unlockLimiter = rateLimit({
   message: { success: false, message: "Too many attempts. Please try again later." },
 });
 
-// Route to check the access code and return the tracklist
+// Route to check a ticket code and return the tracklist
 // POST /api/playlist/unlock
 router.post("/unlock", unlockLimiter, unlockPlaylist);
 

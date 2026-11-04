@@ -1,4 +1,4 @@
-// Tracklist for the Playlist page, only sent to guests who enter the access code. Add, remove or reorder songs here.
+// Tracklist for the Playlist page, only sent to guests who enter a ticket code. Add, remove or reorder songs here.
 export const tracklist = [
   "Settle Down",
   "High Life",

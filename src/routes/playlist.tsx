@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
 import { AuthGate } from "@/components/AuthGate";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -53,7 +53,7 @@ function PlaylistPage() {
         saveCode(candidate);
         setTracks(data.tracks);
       } else if (res.status === 401 && isSavedCode) {
-        // The code was changed since this guest last visited, so ask for the new one.
+        // The ticket behind this saved code is gone, or it's from before codes were tickets.
         saveCode(null);
       } else {
         setError(data.message || "Couldn't check that code. Please try again.");
@@ -90,16 +90,23 @@ function PlaylistPage() {
           <section className="mt-10 sm:mt-12">
             <p className="text-xs uppercase tracking-[0.3em] text-primary/60">[locked]</p>
             <h2 className="mt-3 break-words text-lg uppercase tracking-[0.15em] text-primary sm:text-xl sm:tracking-[0.25em]">
-              Enter your code.
+              Enter your ticket code.
             </h2>
+            <p className="mt-4 break-words text-sm text-primary/70">
+              It's on your pass. No ticket yet?{" "}
+              <Link to="/rsvp" className="underline hover:text-primary">
+                RSVP to get one
+              </Link>
+              .
+            </p>
             <form onSubmit={onSubmit} className="mt-6 flex flex-col gap-3 sm:flex-row">
               <input
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
-                placeholder="access code"
-                aria-label="Access code"
+                placeholder="ticket code"
+                aria-label="Ticket code"
                 autoComplete="off"
-                autoCapitalize="none"
+                autoCapitalize="characters"
                 spellCheck={false}
                 className="min-w-0 flex-1 border border-primary/40 bg-black px-3 py-3 text-base text-primary placeholder:text-primary/30 focus:border-primary focus:outline-none"
               />
