@@ -4,7 +4,7 @@ import PDFDocument from "pdfkit";
  * Generates a premium high-fashion PDF ticket voucher.
  * Matches the Wine & Black absolute dark-theme aesthetic of TheZuriXperience.
  *
- * @param {Object} data - Ticket details: { eventTitle, venue, eventDate, code, eventVol, issuedDate }
+ * @param {Object} data - Ticket details: { eventTitle, venue, eventDate, doors, code, eventVol, issuedDate }
  * @returns {Promise<Buffer>} PDF file binary buffer
  */
 export const generateTicketPDF = (data) => {
@@ -70,7 +70,7 @@ export const generateTicketPDF = (data) => {
 
       // Bottom aesthetic text footer
       doc.font("Courier-Bold").fontSize(8).fillColor(primaryRed);
-      doc.text("[ INVITE ONLY  ·  DOORS AT 9:00 PM  ·  DRESS TO BURN ]", 30, 222, { characterSpacing: 1.5 });
+      doc.text(`[ INVITE ONLY  ·  ${(data.doors || "").toUpperCase()} ]`, 30, 222, { characterSpacing: 1.5 });
 
       // 5. Stub Right Section Content (x: 455 to 580)
       doc.font("Courier-Bold").fontSize(9).fillColor(primaryRed);

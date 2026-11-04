@@ -35,7 +35,7 @@ function EventPage() {
     ["Date", e.date],
     ["Doors", e.doors],
     ["Location", location],
-    ["Dress", `${e.dress} — ${e.dresslbl}`],
+    ["Dress", [e.dress, e.dresslbl].filter(Boolean).join(" — ")],
     ["Lineup", lineupText],
   ];
 

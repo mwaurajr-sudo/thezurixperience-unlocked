@@ -46,7 +46,7 @@ function RsvpPage() {
           code: data.ticket.code,
           quantity: data.ticket.quantity || 1,
           eventTitle: data.ticket.eventTitle || e.name,
-          eventDate: e.date,
+          eventDate: `${e.date} · ${e.doors}`,
         });
         toast.success(`Pass found for ${data.ticket.code}`);
       } else {

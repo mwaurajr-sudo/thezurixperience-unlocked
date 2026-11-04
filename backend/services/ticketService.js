@@ -97,7 +97,8 @@ export const buildTicketPass = async (ticket, event) => {
   const pdfData = {
     eventTitle: event.title,
     venue: event.venue,
-    eventDate: event.date,
+    eventDate: event.when,
+    doors: event.doors,
     code: ticket.code,
     eventVol: ticket.event_vol,
     issuedDate: ticket.created_at.split("T")[0],

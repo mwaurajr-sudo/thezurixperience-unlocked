@@ -29,7 +29,7 @@ const ticketPayload = (ticket, event) => ({
   code: ticket.code,
   quantity: ticket.quantity,
   eventTitle: event.title,
-  eventDate: event.date,
+  eventDate: event.when,
   venue: event.venue,
   email: ticket.email,
 });
@@ -156,7 +156,7 @@ export const createRsvp = async (req, res, next) => {
       await sendRsvpEmail(cleanEmail, {
         customerName: fullName,
         eventTitle: event.title,
-        eventDate: event.date,
+        eventDate: event.when,
         confirmUrl: `${getSiteUrl()}/rsvp/confirm?token=${token}`,
       });
     } catch (mailErr) {

@@ -4,8 +4,8 @@ import { supabase } from "./db.js";
 const DEFAULT_EVENT = {
   vol: "01",
   name: "RnB Nights",
-  date: "6th November",
-  doors: "9:00 PM — 4:00 AM",
+  date: "Friday, 6th November",
+  doors: "Open 6:00 PM · Close 7:30 PM",
   venue: "Myra Residences, Kilimani",
 };
 const DEFAULT_TIER_NAMES = ["Pass"];
@@ -14,7 +14,7 @@ const DEFAULT_TIER_NAMES = ["Pass"];
  * Loads the current event and tier names from site_content. Emails are sent to whatever
  * address a visitor types, so event details must come from here and never from the request.
  *
- * @returns {Promise<Object>} { vol, title, date, doors, venue, tierNames }
+ * @returns {Promise<Object>} { vol, title, date, doors, when, venue, tierNames }
  */
 export const getCurrentEvent = async () => {
   const { data, error } = await supabase
@@ -33,6 +33,7 @@ export const getCurrentEvent = async () => {
     title: event.name,
     date: event.date,
     doors: event.doors,
+    when: `${event.date} · ${event.doors}`,
     venue: event.venue || DEFAULT_EVENT.venue,
     tierNames: tiers,
   };

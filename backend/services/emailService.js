@@ -43,7 +43,7 @@ const buildLayout = ({ title, subtitle, body }) => `
             <p style="color:${TEXT_WHITE};font-size:11px;letter-spacing:2px;margin:10px 0 0 0;text-transform:uppercase;">${subtitle}</p>
           </div>
           ${body}
-          <p style="text-align:center;font-size:10px;color:${PRIMARY_RED};margin-top:30px;letter-spacing:1.5px;">[ LOOK NO FURTHER · DRESS TO BURN ]</p>
+          <p style="text-align:center;font-size:10px;color:${PRIMARY_RED};margin-top:30px;letter-spacing:1.5px;">[ LOOK NO FURTHER ]</p>
         </div>
       </body>
     </html>
