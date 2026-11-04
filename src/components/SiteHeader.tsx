@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
+import { useId, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import logo from "@/assets/zuri-logo.jpeg";
 
@@ -14,6 +15,8 @@ const links = [
 export function SiteHeader() {
   const { signOut } = useAuth();
   const navigate = useNavigate();
+  const menuId = useId();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const onSignOut = async () => {
     await signOut();
@@ -29,24 +32,39 @@ export function SiteHeader() {
             TheZuriXperience
           </span>
         </Link>
-        <nav className="flex flex-wrap items-center gap-x-4 gap-y-2 sm:gap-x-5">
-          {links.map((l) => (
-            <Link
-              key={l.label}
-              to={l.to}
-              className="font-mono text-xs uppercase tracking-[0.15em] text-primary/70 hover:text-primary sm:tracking-[0.3em]"
-              activeProps={{ className: "text-primary" }}
-            >
-              {l.label}
-            </Link>
-          ))}
-          <button
-            onClick={onSignOut}
-            className="font-mono text-xs uppercase tracking-[0.15em] text-primary/50 hover:text-primary sm:tracking-[0.3em]"
+        <button
+          type="button"
+          onClick={() => setMenuOpen((open) => !open)}
+          aria-expanded={menuOpen}
+          aria-controls={menuId}
+          className="shrink-0 border border-primary/40 px-2 py-2 font-mono text-xs uppercase tracking-[0.1em] text-primary hover:border-primary min-[360px]:px-3 min-[360px]:tracking-[0.2em]"
+        >
+          {menuOpen ? "[close]" : "[menu]"}
+        </button>
+        {menuOpen && (
+          <nav
+            id={menuId}
+            className="flex w-full flex-wrap items-center gap-x-4 gap-y-3 border-t border-primary/20 pt-4 sm:gap-x-5"
           >
-            [out]
-          </button>
-        </nav>
+            {links.map((l) => (
+              <Link
+                key={l.label}
+                to={l.to}
+                onClick={() => setMenuOpen(false)}
+                className="font-mono text-xs uppercase tracking-[0.15em] text-primary/70 hover:text-primary sm:tracking-[0.3em]"
+                activeProps={{ className: "text-primary" }}
+              >
+                {l.label}
+              </Link>
+            ))}
+            <button
+              onClick={onSignOut}
+              className="font-mono text-xs uppercase tracking-[0.15em] text-primary/50 hover:text-primary sm:tracking-[0.3em]"
+            >
+              [out]
+            </button>
+          </nav>
+        )}
       </div>
     </header>
   );

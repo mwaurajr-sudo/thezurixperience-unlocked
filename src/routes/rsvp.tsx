@@ -359,13 +359,6 @@ function RsvpPage() {
           </div>
         )}
 
-        {user && (
-          <div className="mt-10 text-xs uppercase tracking-[0.3em]">
-            <Link to="/event" className="text-primary/70 hover:text-primary">
-              ← Back to event
-            </Link>
-          </div>
-        )}
       </main>
     </div>
   );

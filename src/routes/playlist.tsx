@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
 import { AuthGate } from "@/components/AuthGate";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -93,11 +93,7 @@ function PlaylistPage() {
               Enter your ticket code.
             </h2>
             <p className="mt-4 break-words text-sm text-primary/70">
-              It's on your pass. No ticket yet?{" "}
-              <Link to="/rsvp" className="underline hover:text-primary">
-                RSVP to get one
-              </Link>
-              .
+              It's on your pass. No ticket yet? RSVP to get one.
             </p>
             <form onSubmit={onSubmit} className="mt-6 flex flex-col gap-3 sm:flex-row">
               <input

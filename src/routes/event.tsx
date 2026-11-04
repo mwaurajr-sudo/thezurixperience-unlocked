@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { AuthGate } from "@/components/AuthGate";
 import { SiteHeader } from "@/components/SiteHeader";
 import { useSiteContent } from "@/hooks/useSiteContent";
@@ -79,21 +79,6 @@ function EventPage() {
                 </div>
               ))}
             </dl>
-
-            <div className="mt-10 flex flex-wrap gap-3 font-mono">
-              <Link
-                to="/rsvp"
-                className="border border-primary bg-primary px-5 py-3 text-xs uppercase tracking-[0.3em] text-black hover:bg-primary-glow"
-              >
-                → RSVP
-              </Link>
-              <Link
-                to="/about"
-                className="border border-primary/40 px-5 py-3 text-xs uppercase tracking-[0.3em] text-primary/80 hover:border-primary hover:text-primary"
-              >
-                The house
-              </Link>
-            </div>
           </>
         )}
       </main>
