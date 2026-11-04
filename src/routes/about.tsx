@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AuthGate } from "@/components/AuthGate";
 import { SiteHeader } from "@/components/SiteHeader";
-import { useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 
 export const Route = createFileRoute("/about")({
   component: () => (
@@ -14,42 +14,13 @@ export const Route = createFileRoute("/about")({
 
 function AboutPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const scrollRef = useRef<number | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showOverlay, setShowOverlay] = useState(true);
 
-  // Auto-scroll effect while video is playing
-  const startAutoScroll = useCallback(() => {
-    let lastTime: number | null = null;
-    let accumulatedScroll = 0;
-    const scrollSpeed = 0.015; // 0.015 pixels per millisecond (very slow & smooth)
-
-    const scroll = (timestamp: number) => {
-      if (!lastTime) lastTime = timestamp;
-      const delta = timestamp - lastTime;
-      lastTime = timestamp;
-
-      accumulatedScroll += delta * scrollSpeed;
-
-      if (accumulatedScroll >= 1) {
-        const scrollAmount = Math.floor(accumulatedScroll);
-        accumulatedScroll -= scrollAmount;
-
-        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-        if (window.scrollY < maxScroll) {
-          window.scrollBy({ top: scrollAmount });
-        }
-      }
-      scrollRef.current = requestAnimationFrame(scroll);
-    };
-    scrollRef.current = requestAnimationFrame(scroll);
-  }, []);
-
-  const stopAutoScroll = useCallback(() => {
-    if (scrollRef.current !== null) {
-      cancelAnimationFrame(scrollRef.current);
-      scrollRef.current = null;
-    }
+  // A removed video keeps playing its sound, so stop it when the guest leaves this page.
+  useEffect(() => {
+    const video = videoRef.current;
+    return () => video?.pause();
   }, []);
 
   const togglePlay = useCallback(() => {
@@ -59,34 +30,31 @@ function AboutPage() {
     if (video.paused) {
       video.play();
       setIsPlaying(true);
-      startAutoScroll();
       setTimeout(() => setShowOverlay(false), 800);
     } else {
       video.pause();
       setIsPlaying(false);
-      stopAutoScroll();
       setShowOverlay(true);
     }
-  }, [startAutoScroll, stopAutoScroll]);
+  }, []);
 
   const handleVideoEnd = useCallback(() => {
     setIsPlaying(false);
-    stopAutoScroll();
     setShowOverlay(true);
-  }, [stopAutoScroll]);
+  }, []);
 
   return (
-    <div className="min-h-[200vh] bg-black text-primary">
+    <div className="min-h-screen bg-black text-primary">
       <SiteHeader />
-      <main className="mx-auto max-w-4xl px-0 py-16 sm:px-5">
+      <main className="mx-auto max-w-4xl px-0 py-8 sm:px-5">
         <h1 className="px-5 font-mono text-2xl uppercase tracking-[0.3em] sm:px-0">
           &gt; About<span className="animate-blink">_</span>
         </h1>
 
         {/* ── Cinematic Video Section — clean, no borders ── */}
-        <div className="mt-10">
+        <div className="mt-6">
           <div
-            className="group relative cursor-pointer overflow-hidden"
+            className="group relative mx-auto w-fit max-w-full cursor-pointer overflow-hidden"
             onClick={togglePlay}
             onMouseEnter={() => isPlaying && setShowOverlay(true)}
             onMouseLeave={() => isPlaying && setShowOverlay(false)}
@@ -95,11 +63,11 @@ function AboutPage() {
             <video
               ref={videoRef}
               src="/zuri-about.mp4"
-              className="block w-full"
+              className="block h-[calc(100svh-12rem)] min-h-80 max-w-full"
               preload="metadata"
               playsInline
               onEnded={handleVideoEnd}
-              style={{ objectFit: "cover", background: "#000" }}
+              style={{ aspectRatio: "576 / 1024", objectFit: "contain", background: "#000" }}
             />
 
             {/* Play / Pause Overlay */}
