@@ -7,6 +7,7 @@ import { DashboardPanel } from "@/components/admin/DashboardPanel";
 import { HeroPanel } from "@/components/admin/HeroPanel";
 import { EventPanel } from "@/components/admin/EventPanel";
 import { TicketsPanel } from "@/components/admin/TicketsPanel";
+import { EmailPanel } from "@/components/admin/EmailPanel";
 import {
   MerchPanel,
   PlaylistsPanel,
@@ -36,6 +37,7 @@ function AdminPage() {
       {activePanel === "hero" && <HeroPanel />}
       {activePanel === "event" && <EventPanel />}
       {activePanel === "tickets" && <TicketsPanel />}
+      {activePanel === "email" && <EmailPanel />}
       {activePanel === "merch" && <MerchPanel />}
       {activePanel === "playlists" && <PlaylistsPanel />}
       {activePanel === "brands" && <BrandsPanel />}

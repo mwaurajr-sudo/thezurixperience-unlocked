@@ -40,8 +40,8 @@ Do these once, in this order.
    | `SUPABASE_PUBLISHABLE_KEY` | Text | Supabase publishable key (same as in `.env.production`) |
    | `SUPABASE_SERVICE_ROLE_KEY` | **Secret** | Supabase → Project Settings → API → service_role key |
    | `RESEND_API_KEY` | **Secret** | the Resend key from step 3 |
-   | `EMAIL_FROM` | Text | e.g. `tickets@<your domain>` (RSVP and ticket emails) |
-   | `INVITE_EMAIL_FROM` | Text | optional, e.g. `invites@<your domain>` (defaults to `EMAIL_FROM`) |
+   | `EMAIL_FROM` | Text | e.g. `tickets@<your domain>` (RSVP and ticket emails). Before the domain is verified in Resend, use `onboarding@resend.dev`: emails then only reach your own Resend sign-up address |
+   | `INVITE_EMAIL_FROM` | Text | optional, e.g. `invites@<your domain>`, for invites and admin-written emails (defaults to `EMAIL_FROM`) |
    | `REPLY_TO` | Text | optional, where guests' replies go |
    | `PUBLIC_SITE_URL` | Text | `https://<your domain>` (used in email links) |
 
@@ -59,6 +59,11 @@ when URI Path starts with `/api/`, more than 30 requests in 10 seconds from one 
 
 ## 7. Switch off Render
 Once the new address works, delete the service in the Render dashboard.
+
+## Sending email from the admin page
+Admin → **Email**: write a subject and message, add recipients (paste them, or add ticket holders,
+everyone who RSVP'd, or everyone invited), send a test to yourself, then send. Resend's free plan sends
+up to 100 emails a day.
 
 ## Switches in the code
 - RSVPs: `src/lib/rsvp-status.ts` (`RSVP_PAUSED`). Pausing hides the page and the API refuses new RSVPs.

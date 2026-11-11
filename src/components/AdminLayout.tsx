@@ -6,6 +6,7 @@ import {
   Sparkles,
   CalendarDays,
   Ticket,
+  Mail,
   ShoppingBag,
   Disc3,
   Building2,
@@ -25,6 +26,7 @@ export type AdminPanel =
   | "hero"
   | "event"
   | "tickets"
+  | "email"
   | "merch"
   | "playlists"
   | "brands"
@@ -37,6 +39,7 @@ const navItems: Array<{ id: AdminPanel; label: string; icon: React.ElementType; 
   { id: "hero", label: "Hero & Manifesto", icon: Sparkles, section: "Content" },
   { id: "event", label: "Event Details", icon: CalendarDays, section: "Content" },
   { id: "tickets", label: "Tickets & RSVPs", icon: Ticket, section: "Content" },
+  { id: "email", label: "Email", icon: Mail, section: "Content" },
   { id: "merch", label: "Merch Drops", icon: ShoppingBag, section: "Content" },
   { id: "playlists", label: "Playlists", icon: Disc3, section: "Content" },
   { id: "brands", label: "Brand Partners", icon: Building2, section: "Content" },

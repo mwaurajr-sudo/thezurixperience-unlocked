@@ -186,6 +186,23 @@ type Message = {
   attachments?: { filename: string; content: Uint8Array }[];
 };
 
+// Resend accepts a few requests a second per account, so sends are spaced out, and a
+// "too many requests" reply is retried once after a pause.
+const MIN_GAP_MS = 600;
+let nextSendAt = 0;
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/** Resend's own explanation from an error reply, e.g. that test mode only sends to your own address. */
+const resendReason = (detail: string) => {
+  try {
+    const parsed = JSON.parse(detail) as { message?: string };
+    if (parsed.message) return parsed.message;
+  } catch {
+    // not JSON
+  }
+  return detail.slice(0, 300);
+};
+
 /** Sends one email through the Resend API. Throws with Resend's reason if it is refused. */
 const dispatch = async ({ from, to, subject, html, attachments = [] }: Message) => {
   const apiKey = process.env.RESEND_API_KEY;
@@ -193,24 +210,34 @@ const dispatch = async ({ from, to, subject, html, attachments = [] }: Message) 
     throw new Error("Email isn't set up: add RESEND_API_KEY and EMAIL_FROM in Cloudflare.");
   }
 
-  const response = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      from,
-      to: [to],
-      reply_to: process.env.REPLY_TO || "zurixperience@gmail.com",
-      subject,
-      html,
-      attachments: attachments.map((a) => ({ filename: a.filename, content: base64(a.content) })),
-    }),
+  const body = JSON.stringify({
+    from,
+    to: [to],
+    reply_to: process.env.REPLY_TO || "zurixperience@gmail.com",
+    subject,
+    html,
+    attachments: attachments.map((a) => ({ filename: a.filename, content: base64(a.content) })),
   });
 
-  if (!response.ok) {
+  for (let attempt = 0; ; attempt++) {
+    const wait = nextSendAt - Date.now();
+    if (wait > 0) await sleep(wait);
+    nextSendAt = Date.now() + MIN_GAP_MS;
+
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body,
+    });
+
+    if (response.ok) return response.json();
     const detail = await response.text().catch(() => "");
-    throw new Error(`Resend refused the email (${response.status}): ${detail.slice(0, 300)}`);
+    if (response.status === 429 && attempt === 0) {
+      await sleep(1500);
+      continue;
+    }
+    throw new Error(resendReason(detail) || `Resend refused the email (${response.status}).`);
   }
-  return response.json();
 };
 
 /** The "confirm your attendance" email. */
@@ -239,4 +266,40 @@ export const sendInviteEmail = (toEmail: string, data: InviteEmailData) =>
     to: toEmail,
     subject: data.guestName ? `${data.guestName}, we want you at Zuri` : "We want you at Zuri",
     html: buildInviteTemplate(data),
+  });
+
+/** Turns plain text into safe HTML: paragraphs on blank lines, line breaks kept, web links clickable. */
+const messageToHtml = (message: string) =>
+  message
+    .trim()
+    .split(/\n\s*\n/)
+    .map((block) =>
+      escapeHtml(block)
+        .replace(/\n/g, "<br>")
+        .replace(
+          /(https?:\/\/[^\s<]+[^\s<.,!?;:)])/g,
+          `<a href="$1" style="color:${PRIMARY_RED};">$1</a>`,
+        ),
+    )
+    .map((html) => paragraph(html))
+    .join("");
+
+/** An email written by an admin, in the site's layout and signed by Zuri. */
+const buildCustomTemplate = (subject: string, message: string) =>
+  buildLayout({
+    title: escapeHtml(subject),
+    subtitle: "A message from Zuri",
+    body: `
+      ${messageToHtml(message)}
+      ${paragraph(`<strong style="color:${PRIMARY_RED};">ZURI</strong>`)}
+    `,
+  });
+
+/** Sends an admin-written message, from the invite sender (or EMAIL_FROM). */
+export const sendCustomEmail = (toEmail: string, subject: string, message: string) =>
+  dispatch({
+    from: sender(process.env.INVITE_EMAIL_FROM || process.env.EMAIL_FROM),
+    to: toEmail,
+    subject,
+    html: buildCustomTemplate(subject, message),
   });

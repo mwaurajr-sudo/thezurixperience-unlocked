@@ -76,29 +76,33 @@ export const countAttempt = (request: Request, name: string, windowMs: number) =
 const bearerToken = (request: Request) =>
   request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") || null;
 
-/** The signed-in user's id from the Supabase session sent as a bearer token, if any. */
-export const userIdFrom = async (request: Request): Promise<string | null> => {
+/** The signed-in user from the Supabase session sent as a bearer token, if any. */
+export const userFrom = async (request: Request): Promise<{ id: string; email: string | null } | null> => {
   const token = bearerToken(request);
   if (!token) return null;
   const { data, error } = await db().auth.getUser(token);
-  return error ? null : (data.user?.id ?? null);
+  if (error || !data.user) return null;
+  return { id: data.user.id, email: (data.user as { email?: string | null }).email ?? null };
 };
 
-/** Lets only signed-in admins through; throws 401/403 otherwise. */
-export const requireAdmin = async (request: Request): Promise<string> => {
-  const userId = await userIdFrom(request);
-  if (!userId) throw new HttpError(401, "Please sign in.");
+/** The signed-in user's id, if any. */
+export const userIdFrom = async (request: Request): Promise<string | null> => (await userFrom(request))?.id ?? null;
+
+/** Lets only signed-in admins through; throws 401/403 otherwise. Returns the admin. */
+export const requireAdmin = async (request: Request) => {
+  const user = await userFrom(request);
+  if (!user) throw new HttpError(401, "Please sign in.");
 
   const { data: role, error } = await db()
     .from("user_roles")
     .select("role")
-    .eq("user_id", userId)
+    .eq("user_id", user.id)
     .eq("role", "admin")
     .maybeSingle();
 
   if (error) throw error;
   if (!role) throw new HttpError(403, "Admins only.");
-  return userId;
+  return user;
 };
 
 export const validateEmail = (email: unknown) =>
