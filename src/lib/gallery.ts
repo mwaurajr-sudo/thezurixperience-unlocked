@@ -39,6 +39,8 @@ export const volumes: GalleryVolume[] = [
       photo("volume-1", 9),
       photo("volume-1", 10),
       photo("volume-1", 11),
+      photo("volume-1", 12, 720, 1280),
+      photo("volume-1", 13, 720, 1280),
     ],
   },
 ];
@@ -46,35 +48,42 @@ export const volumes: GalleryVolume[] = [
 export const findVolume = (slug: string) => volumes.find((v) => v.slug === slug);
 
 /**
- * Where each photo lands on the wall, in percent of the wall's width (x, w) and height (y),
- * plus a tilt in degrees. Hand-placed so the pile looks tossed rather than gridded;
+ * Where each photo lands on the wall. x and w are percent of the wall's width; y is measured
+ * in the same units (percent of the width), so the wall can grow taller for bigger volumes.
+ * r is a tilt in degrees. Hand-placed so the pile looks tossed rather than gridded;
  * volumes with more photos than slots repeat the pattern further down.
  */
 const SLOTS = [
-  { x: 2, y: 1, r: -7, w: 27 },
-  { x: 35, y: 5, r: 4, w: 24 },
+  { x: 2, y: 2, r: -7, w: 27 },
+  { x: 35, y: 8, r: 4, w: 24 },
   { x: 68, y: 0, r: -3, w: 28 },
-  { x: 15, y: 21, r: 6, w: 25 },
-  { x: 49, y: 24, r: -5, w: 27 },
-  { x: 77, y: 29, r: 8, w: 21 },
-  { x: 0, y: 43, r: 3, w: 25 },
-  { x: 29, y: 46, r: -8, w: 22 },
-  { x: 58, y: 49, r: 5, w: 27 },
-  { x: 9, y: 66, r: -4, w: 25 },
-  { x: 43, y: 69, r: 7, w: 26 },
-  { x: 72, y: 71, r: -6, w: 24 },
+  { x: 15, y: 32, r: 6, w: 25 },
+  { x: 49, y: 36, r: -5, w: 27 },
+  { x: 77, y: 44, r: 8, w: 21 },
+  { x: 0, y: 65, r: 3, w: 25 },
+  { x: 29, y: 69, r: -8, w: 22 },
+  { x: 58, y: 74, r: 5, w: 27 },
+  { x: 9, y: 99, r: -4, w: 25 },
+  { x: 43, y: 104, r: 7, w: 26 },
+  { x: 74, y: 108, r: -6, w: 23 },
+  { x: 20, y: 134, r: 5, w: 24 },
+  { x: 55, y: 139, r: -4, w: 25 },
+  { x: 1, y: 160, r: -9, w: 22 },
 ];
 
-const ROWS_PER_PATTERN = 100;
+// How far down each repeat of the pattern starts, in percent of the wall's width.
+const PATTERN_HEIGHT = 190;
+// Border and caption around each print, in percent of the wall's width.
+const FRAME = 6;
 
-export const scatterLayout = (count: number) => {
-  const patterns = Math.max(1, Math.ceil(count / SLOTS.length));
-  // Taller wall for more photos; y is then rescaled so every pattern gets its own band.
-  const aspect = 1.5 * patterns;
-  const slots = Array.from({ length: count }, (_, i) => {
+export const scatterLayout = (photos: GalleryPhoto[]) => {
+  const placed = photos.map((p, i) => {
     const s = SLOTS[i % SLOTS.length];
-    const band = Math.floor(i / SLOTS.length);
-    return { ...s, y: (s.y + band * ROWS_PER_PATTERN) / patterns };
+    const y = s.y + Math.floor(i / SLOTS.length) * PATTERN_HEIGHT;
+    return { ...s, y, bottom: y + (s.w * p.height) / p.width + FRAME };
   });
+  // Wall height as a multiple of its width: just enough to hold the lowest print.
+  const aspect = Math.max(...placed.map((s) => s.bottom), 100) / 100 + 0.04;
+  const slots = placed.map(({ bottom: _bottom, ...s }) => ({ ...s, y: s.y / aspect }));
   return { aspect, slots };
 };

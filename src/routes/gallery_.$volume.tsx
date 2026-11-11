@@ -43,7 +43,7 @@ function VolumePage() {
 type Offset = { dx: number; dy: number };
 
 function ScatterWall({ volume }: { volume: GalleryVolume }) {
-  const { aspect, slots } = scatterLayout(volume.photos.length);
+  const { aspect, slots } = scatterLayout(volume.photos);
   const [offsets, setOffsets] = useState<Offset[]>(() => volume.photos.map(() => ({ dx: 0, dy: 0 })));
   // Stacking order: the last photo touched sits on top.
   const [order, setOrder] = useState<number[]>(() => volume.photos.map((_, i) => i));
