@@ -1,8 +1,14 @@
-import nodemailer from "nodemailer";
-import axios from "axios";
-import dotenv from "dotenv";
+// Emails for invites, RSVP confirmations and tickets, sent through Resend (https://resend.com).
+// Settings, set as Cloudflare secrets/variables:
+//   RESEND_API_KEY     - the Resend API key
+//   EMAIL_FROM         - sender for RSVP and ticket emails, e.g. tickets@thezurixperience.co.ke
+//   INVITE_EMAIL_FROM  - sender for invites (optional; falls back to EMAIL_FROM)
+//   REPLY_TO           - where guests' replies go (optional)
+// The sender's domain must be verified in Resend first.
+import type { TicketPdfData } from "./pdf.server";
 
-dotenv.config();
+type RsvpEmailData = { customerName: string; eventTitle: string; eventDate: string; confirmUrl: string };
+type InviteEmailData = { guestName: string; eventDate: string; doors: string; rsvpUrl: string };
 
 // Guests see this as the sender, whichever mailbox the email goes out through.
 const SENDER_NAME = "Zuri";
@@ -16,19 +22,19 @@ const TEXT_WHITE = "#f2f2f2";
 /**
  * Guest-supplied values end up in the HTML, so they must never be rendered as markup.
  */
-const escapeHtml = (value) =>
+const escapeHtml = (value: unknown) =>
   String(value ?? "").replace(/[&<>"']/g, (c) => ({
     "&": "&amp;",
     "<": "&lt;",
     ">": "&gt;",
     '"': "&quot;",
     "'": "&#39;",
-  })[c]);
+  } as Record<string, string>)[c]);
 
 /**
  * Wraps email content in the shared TheZuriXperience layout.
  */
-const buildLayout = ({ title, subtitle, body }) => `
+const buildLayout = ({ title, subtitle, body }: { title: string; subtitle: string; body: string }) => `
     <!DOCTYPE html>
     <html>
       <head>
@@ -49,10 +55,10 @@ const buildLayout = ({ title, subtitle, body }) => `
     </html>
   `;
 
-const paragraph = (html) =>
+const paragraph = (html: string) =>
   `<div style="font-size:13px;line-height:1.8;color:${TEXT_GREY};margin-bottom:25px;">${html}</div>`;
 
-const detailRow = (label, value) => `
+const detailRow = (label: string, value: unknown) => `
   <div style="margin:8px 0;font-size:12px;">
     <span style="color:${TEXT_GREY};display:inline-block;width:140px;">${label}:</span>
     <span style="color:${TEXT_WHITE};font-weight:bold;">${escapeHtml(value)}</span>
@@ -64,7 +70,7 @@ const detailRow = (label, value) => `
  * @param {Object} data - { customerName, eventTitle, eventDate, confirmUrl }
  * @returns {string} HTML body
  */
-const buildRsvpTemplate = (data) =>
+const buildRsvpTemplate = (data: RsvpEmailData) =>
   buildLayout({
     title: "Confirm Your Attendance",
     subtitle: "RSVP received — one step left",
@@ -92,7 +98,7 @@ const buildRsvpTemplate = (data) =>
  * @param {Object} data - { eventTitle, eventDate, venue, code }
  * @returns {string} HTML body
  */
-const buildTicketTemplate = (data) =>
+const buildTicketTemplate = (data: TicketPdfData) =>
   buildLayout({
     title: "Your Ticket",
     subtitle: "Entry confirmed & registered",
@@ -121,8 +127,8 @@ const buildTicketTemplate = (data) =>
  * @param {Object} data - { guestName, eventDate, doors, rsvpUrl }
  * @returns {string} HTML body
  */
-const buildInviteTemplate = (data) => {
-  const listItem = (html) => `<li style="margin-bottom:6px;">${html}</li>`;
+const buildInviteTemplate = (data: InviteEmailData) => {
+  const listItem = (html: string) => `<li style="margin-bottom:6px;">${html}</li>`;
   const callout = data.guestName
     ? `<strong style="color:${TEXT_WHITE};">${escapeHtml(data.guestName)}</strong>, we want you at Zuri.`
     : "We want you at Zuri.";
@@ -158,145 +164,78 @@ const buildInviteTemplate = (data) => {
   });
 };
 
-/**
- * Reads one sender's settings. Invites have their own account and never fall back to
- * the one that handles RSVP and ticket emails.
- *
- * @param {string} prefix - Environment variable prefix ("EMAIL" or "INVITE_EMAIL")
- */
-const readSender = (prefix) => {
-  const user = process.env[`${prefix}_USER`];
-  const pass = process.env[`${prefix}_PASSWORD`];
-  const configuredFrom = process.env[`${prefix}_FROM`] || user;
-  const address = configuredFrom?.match(/<([^>]+)>/)?.[1] ?? configuredFrom;
-  return {
-    prefix,
-    user,
-    pass,
-    service: process.env[`${prefix}_SERVICE`] || "gmail",
-    host: process.env[`${prefix}_HOST`],
-    port: process.env[`${prefix}_PORT`],
-    from: address ? `"${SENDER_NAME}" <${address}>` : null,
-    replyTo: process.env[`${prefix}_REPLY_TO`] || process.env.REPLY_TO || "zurixperience@gmail.com",
-    hasSmtp: Boolean(user && pass && user !== "your-email@gmail.com" && pass !== "your-gmail-app-password"),
-  };
+/** "Zuri <address>" from a configured sender, which may be a bare address or "Name <address>". */
+const sender = (configured: string | undefined) => {
+  const address = configured?.match(/<([^>]+)>/)?.[1] ?? configured?.trim();
+  return address ? `${SENDER_NAME} <${address}>` : null;
 };
 
-const buildTransport = (sender) => {
-  const auth = { user: sender.user, pass: sender.pass };
-  if (sender.host) {
-    const port = Number(sender.port) || 587;
-    return nodemailer.createTransport({ host: sender.host, port, secure: port === 465, auth });
+const base64 = (bytes: Uint8Array) => {
+  let binary = "";
+  for (let i = 0; i < bytes.length; i += 0x8000) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
   }
-  return nodemailer.createTransport({ service: sender.service, auth });
+  return btoa(binary);
 };
 
-/**
- * Sends a message from the given sender using Nodemailer SMTP, or the Resend API
- * if SMTP is unavailable.
- *
- * @param {Object} sender - Result of readSender
- * @param {Object} message - { to, subject, html, attachments }
- * @returns {Promise<Object>} Sending receipt result
- */
-const dispatch = async (sender, { to, subject, html, attachments = [] }) => {
-  if (sender.hasSmtp) {
-    try {
-      const info = await buildTransport(sender).sendMail({
-        from: sender.from,
-        replyTo: sender.replyTo,
-        to,
-        subject,
-        html,
-        attachments,
-      });
-      console.log(`Email dispatched via SMTP (${sender.prefix}):`, info.messageId);
-      return info;
-    } catch (err) {
-      console.error(`SMTP transmission failure (${sender.prefix}):`, err.message);
-      if (!process.env.RESEND_API_KEY) {
-        throw new Error(`Email dispatch failed via SMTP: ${err.message}`);
-      }
-      console.log("Attempting fallback to Resend API...");
-    }
-  }
-
-  if (process.env.RESEND_API_KEY && sender.from) {
-    try {
-      const response = await axios.post(
-        "https://api.resend.com/emails",
-        {
-          from: sender.from,
-          reply_to: sender.replyTo,
-          to,
-          subject,
-          html,
-          attachments: attachments.map((a) => ({
-            filename: a.filename,
-            content: a.content.toString("base64"),
-          })),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      return response.data;
-    } catch (err) {
-      console.error("Resend API transmission failure:", err.response?.data || err.message);
-      throw new Error(`Email dispatch failed via Resend: ${err.message}`);
-    }
-  }
-
-  throw new Error(
-    `Missing email credentials. Configure ${sender.prefix}_USER and ${sender.prefix}_PASSWORD (or RESEND_API_KEY and ${sender.prefix}_FROM) in backend/.env.`
-  );
+type Message = {
+  from: string | null;
+  to: string;
+  subject: string;
+  html: string;
+  attachments?: { filename: string; content: Uint8Array }[];
 };
 
-/**
- * Sends the "confirm your attendance" email from the main address (EMAIL_*).
- *
- * @param {string} toEmail - Guest email address
- * @param {Object} data - RSVP and event details, including confirmUrl
- */
-export const sendRsvpEmail = (toEmail, data) =>
-  dispatch(readSender("EMAIL"), {
+/** Sends one email through the Resend API. Throws with Resend's reason if it is refused. */
+const dispatch = async ({ from, to, subject, html, attachments = [] }: Message) => {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey || !from) {
+    throw new Error("Email isn't set up: add RESEND_API_KEY and EMAIL_FROM in Cloudflare.");
+  }
+
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      from,
+      to: [to],
+      reply_to: process.env.REPLY_TO || "zurixperience@gmail.com",
+      subject,
+      html,
+      attachments: attachments.map((a) => ({ filename: a.filename, content: base64(a.content) })),
+    }),
+  });
+
+  if (!response.ok) {
+    const detail = await response.text().catch(() => "");
+    throw new Error(`Resend refused the email (${response.status}): ${detail.slice(0, 300)}`);
+  }
+  return response.json();
+};
+
+/** The "confirm your attendance" email. */
+export const sendRsvpEmail = (toEmail: string, data: RsvpEmailData) =>
+  dispatch({
+    from: sender(process.env.EMAIL_FROM),
     to: toEmail,
     subject: `Confirm your attendance — ${data.eventTitle}`,
     html: buildRsvpTemplate(data),
   });
 
-/**
- * Sends the ticket with its PDF attached from the main address (EMAIL_*).
- *
- * @param {string} toEmail - Guest email address
- * @param {Object} ticketData - Ticket and event details
- * @param {Buffer} pdfBuffer - Generated PDF binary buffer
- */
-export const sendTicketEmail = (toEmail, ticketData, pdfBuffer) =>
-  dispatch(readSender("EMAIL"), {
+/** The ticket, with its PDF pass attached. */
+export const sendTicketEmail = (toEmail: string, ticketData: TicketPdfData, pdf: Uint8Array) =>
+  dispatch({
+    from: sender(process.env.EMAIL_FROM),
     to: toEmail,
     subject: `Your ticket: ${ticketData.code} — TheZuriXperience`,
     html: buildTicketTemplate(ticketData),
-    attachments: [
-      {
-        filename: `Ticket-${ticketData.code}.pdf`,
-        content: pdfBuffer,
-        contentType: "application/pdf",
-      },
-    ],
+    attachments: [{ filename: `Ticket-${ticketData.code}.pdf`, content: pdf }],
   });
 
-/**
- * Sends the event invite from the invite address (INVITE_EMAIL_*).
- *
- * @param {string} toEmail - Guest email address
- * @param {Object} data - Event details and rsvpUrl
- */
-export const sendInviteEmail = (toEmail, data) =>
-  dispatch(readSender("INVITE_EMAIL"), {
+/** The event invite, with the link to RSVP. */
+export const sendInviteEmail = (toEmail: string, data: InviteEmailData) =>
+  dispatch({
+    from: sender(process.env.INVITE_EMAIL_FROM || process.env.EMAIL_FROM),
     to: toEmail,
     subject: data.guestName ? `${data.guestName}, we want you at Zuri` : "We want you at Zuri",
     html: buildInviteTemplate(data),

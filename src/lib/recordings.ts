@@ -1,6 +1,11 @@
-// DJ sets hosted with the site, shown on /recordings with a built-in player.
-// To add one: put the audio file in public/recordings/ and add an entry below.
+// DJ sets shown on /recordings with a built-in player.
+// The audio files are too big for the site itself (Cloudflare's limit is 25 MB a file), so they
+// live in a Cloudflare R2 bucket. VITE_MEDIA_URL is that bucket's public address, set as a build
+// variable in Cloudflare; without it the files are looked for in public/recordings/ (handy locally).
+// To add a set: upload it to the bucket's recordings/ folder and add an entry below.
 // Sets hosted elsewhere (Mixcloud, SoundCloud) can still be added as links from the admin panel.
+
+const MEDIA_URL: string = (import.meta.env.VITE_MEDIA_URL || "").replace(/\/$/, "");
 
 export type HostedRecording = {
   vol: string;
@@ -14,13 +19,13 @@ export const hostedRecordings: HostedRecording[] = [
   {
     vol: "01",
     title: "Apartment Zuri",
-    src: "/recordings/apartment-zuri-pt1.m4a",
+    src: `${MEDIA_URL}/recordings/apartment-zuri-pt1.m4a`,
     duration: 3323,
   },
   {
     vol: "01",
     title: "Apartment Zuri Pt. 2",
-    src: "/recordings/apartment-zuri-pt2.m4a",
+    src: `${MEDIA_URL}/recordings/apartment-zuri-pt2.m4a`,
     duration: 3816,
   },
 ];

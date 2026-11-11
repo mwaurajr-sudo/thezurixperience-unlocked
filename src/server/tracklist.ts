@@ -1,5 +1,5 @@
 // Tracklist for the Playlist page, only sent to guests who enter a ticket code. Add, remove or reorder songs here.
-export const tracklist = [
+export const tracklist: string[] = [
   "Settle Down",
   "High Life",
   "Every Gyal",

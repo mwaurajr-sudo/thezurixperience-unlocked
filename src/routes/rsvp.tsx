@@ -7,11 +7,9 @@ import { usePassesLeft } from "@/hooks/usePassesLeft";
 import { useSiteContent, type TicketTier } from "@/hooks/useSiteContent";
 import { DigitalTicketPass, type DigitalTicketPassProps } from "@/components/DigitalTicketPass";
 import { BACKEND_URL } from "@/lib/backend";
+import { RSVP_PAUSED } from "@/lib/rsvp-status";
 import { CheckCircle2, Search, X, Mail, Ticket } from "lucide-react";
 
-// RSVPs are paused, so this page sends visitors home. To bring it back, set this to false
-// and add RSVP back to the links in src/components/SiteHeader.tsx.
-const RSVP_PAUSED = true;
 
 export const Route = createFileRoute("/rsvp")({
   beforeLoad: () => {

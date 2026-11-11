@@ -1,7 +1,11 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "tanstack-start-app",
+  "name": "thezurixperience",
   "compatibility_date": "2025-09-24",
   "compatibility_flags": ["nodejs_compat"],
   "main": "@tanstack/react-start/server-entry",
+  // Keep the variables and secrets set in the Cloudflare dashboard on every deploy.
+  "keep_vars": true,
+  // Lets you read the site's logs in the Cloudflare dashboard.
+  "observability": { "enabled": true },
 }
