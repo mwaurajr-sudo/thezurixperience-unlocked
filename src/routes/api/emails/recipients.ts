@@ -5,13 +5,12 @@ import { handle, HttpError, json, requireAdmin } from "@/server/http.server";
 // Which table and rows each recipient group comes from.
 const GROUPS = {
   tickets: { table: "tickets", filter: null },
-  rsvps: { table: "rsvps", filter: null },
   invites: { table: "invites", filter: ["status", "sent"] },
 } as const;
 
 type Group = keyof typeof GROUPS;
 
-/** Admins only: the email addresses in a guest group (?group=tickets|rsvps|invites), across all chapters. */
+/** Admins only: the email addresses in a guest group (?group=tickets|invites), across all chapters. */
 export const Route = createFileRoute("/api/emails/recipients")({
   server: {
     handlers: {
@@ -20,7 +19,7 @@ export const Route = createFileRoute("/api/emails/recipients")({
 
         const group = new URL(request.url).searchParams.get("group") as Group | null;
         if (!group || !(group in GROUPS)) {
-          throw new HttpError(400, "Choose tickets, rsvps or invites.");
+          throw new HttpError(400, "Choose tickets or invites.");
         }
 
         const { table, filter } = GROUPS[group];

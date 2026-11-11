@@ -61,8 +61,8 @@ when URI Path starts with `/api/`, more than 30 requests in 10 seconds from one 
 Once the new address works, delete the service in the Render dashboard.
 
 ## Sending email from the admin page
-Admin → **Email**: write a subject and message, add recipients (paste them, or add ticket holders,
-everyone who RSVP'd, or everyone invited), send a test to yourself, then send. Resend's free plan sends
+Admin → **Email**: write a subject and message, add recipients (paste them, or add ticket holders
+or everyone invited), send a test to yourself, then send. Resend's free plan sends
 up to 100 emails a day.
 
 ## Switches in the code

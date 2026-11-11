@@ -11,11 +11,10 @@ import { Textarea } from "@/components/ui/textarea";
 // Matches the server's per-request limit; longer lists go out in several requests.
 const BATCH_SIZE = 25;
 
-type Group = "tickets" | "rsvps" | "invites";
+type Group = "tickets" | "invites";
 
 const GROUPS: { id: Group; label: string }[] = [
   { id: "tickets", label: "Ticket holders" },
-  { id: "rsvps", label: "Everyone who RSVP'd" },
   { id: "invites", label: "Everyone invited" },
 ];
 
