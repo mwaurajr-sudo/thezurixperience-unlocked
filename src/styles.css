@@ -144,3 +144,149 @@
   to { opacity: 1; transform: translateY(0); }
 }
 .animate-fade-in { animation: fade-in 0.6s ease-out both; }
+
+/* ── Gallery ─────────────────────────────────────────────── */
+
+/* Folder on /gallery, with a few photos peeking out of it */
+.zx-folder-art {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  max-width: 22rem;
+}
+.zx-folder-back {
+  position: absolute;
+  inset: 8% 0 0 0;
+  border: 1px solid oklch(0.62 0.24 25 / 0.45);
+  background: oklch(0.05 0.02 25);
+}
+.zx-folder-back::before {
+  /* folder tab */
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: -9%;
+  width: 38%;
+  height: 9%;
+  border: 1px solid oklch(0.62 0.24 25 / 0.45);
+  border-bottom: 0;
+  background: oklch(0.05 0.02 25);
+}
+.zx-folder-peek {
+  position: absolute;
+  width: 34%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border: 4px solid #0b0b0b;
+  outline: 1px solid oklch(0.62 0.24 25 / 0.35);
+  transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.zx-folder-peek-0 { left: 10%; top: 4%; transform: rotate(-9deg); }
+.zx-folder-peek-1 { left: 33%; top: 0%; transform: rotate(3deg); }
+.zx-folder-peek-2 { left: 56%; top: 6%; transform: rotate(11deg); }
+.zx-folder:hover .zx-folder-peek-0 { transform: translate(-14%, -16%) rotate(-16deg); }
+.zx-folder:hover .zx-folder-peek-1 { transform: translate(0, -22%) rotate(2deg); }
+.zx-folder:hover .zx-folder-peek-2 { transform: translate(14%, -14%) rotate(17deg); }
+.zx-folder-front {
+  position: absolute;
+  inset: 42% 0 0 0;
+  display: flex;
+  align-items: flex-end;
+  padding: 0.9rem 1rem;
+  border: 1px solid oklch(0.62 0.24 25 / 0.6);
+  background: linear-gradient(to bottom, oklch(0.09 0.03 25), oklch(0.03 0.01 25));
+  box-shadow: 0 -10px 30px oklch(0 0 0 / 0.6);
+  transform-origin: bottom;
+  transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.45s;
+}
+.zx-folder:hover .zx-folder-front {
+  transform: perspective(600px) rotateX(-14deg);
+  box-shadow: 0 -10px 30px oklch(0 0 0 / 0.6), 0 0 24px oklch(0.62 0.24 25 / 0.25);
+}
+
+/* Volume wall: a loose, overlapping column on phones; a scattered pile on wider screens */
+.zx-wall {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 3rem;
+}
+.zx-photo {
+  position: relative;
+  width: 78%;
+  margin-top: -14%;
+  padding: 0.55rem 0.55rem 0;
+  background: #0b0b0b;
+  border: 1px solid oklch(0.62 0.24 25 / 0.3);
+  box-shadow: 0 14px 30px oklch(0 0 0 / 0.85), 0 0 0 1px oklch(0 0 0);
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  transform: translate(var(--dx, 0), var(--dy, 0)) rotate(var(--r, 0deg));
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s, border-color 0.35s;
+  animation: zx-toss 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+.zx-photo:first-child { margin-top: 0; }
+.zx-photo-left { align-self: flex-start; }
+.zx-photo-right { align-self: flex-end; }
+.zx-photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+  filter: saturate(1.05) contrast(1.03);
+}
+.zx-photo figcaption {
+  padding: 0.5rem 0.1rem 0.6rem;
+  font-family: "Special Elite", "Courier New", monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  color: oklch(0.62 0.24 25 / 0.75);
+}
+.zx-photo:hover,
+.zx-photo:focus-visible {
+  outline: none;
+  border-color: oklch(0.62 0.24 25 / 0.8);
+  box-shadow: 0 20px 40px oklch(0 0 0 / 0.9), 0 0 28px oklch(0.62 0.24 25 / 0.35);
+  transform: translate(var(--dx, 0), var(--dy, 0)) rotate(calc(var(--r, 0deg) * 0.3)) scale(1.04);
+}
+.zx-tape {
+  position: absolute;
+  top: -0.7rem;
+  left: 50%;
+  width: 34%;
+  height: 1.4rem;
+  transform: translateX(-50%) rotate(-4deg);
+  background: oklch(0.62 0.24 25 / 0.35);
+  box-shadow: 0 1px 3px oklch(0 0 0 / 0.5);
+  backdrop-filter: blur(1px);
+}
+
+@media (min-width: 768px) {
+  .zx-wall {
+    position: relative;
+    display: block;
+    aspect-ratio: 1 / var(--wall-aspect, 1.5);
+    padding-bottom: 0;
+  }
+  .zx-photo {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: var(--w);
+    margin: 0;
+    cursor: grab;
+  }
+  .zx-photo:active { cursor: grabbing; }
+  .zx-photo figcaption { font-size: 0.7rem; }
+}
+
+@keyframes zx-toss {
+  from {
+    opacity: 0;
+    transform: translate(0, -40px) rotate(calc(var(--r, 0deg) * -2)) scale(1.12);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zx-photo, .zx-folder-peek, .zx-folder-front { animation: none; transition: none; }
+}

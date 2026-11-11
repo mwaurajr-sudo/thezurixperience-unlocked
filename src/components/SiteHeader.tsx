@@ -9,6 +9,7 @@ const links = [
   { label: "RSVP", to: "/rsvp" as const },
   { label: "Playlist", to: "/playlist" as const },
   { label: "Recordings", to: "/recordings" as const },
+  { label: "Gallery", to: "/gallery" as const },
   { label: "Settings", to: "/settings" as const },
 ];
 
