@@ -8,6 +8,7 @@
  * - Everything else      →  Nitro SSR frontend
  */
 
+import fs from "fs";
 import http from "http";
 import net from "net";
 import { spawn } from "child_process";
@@ -86,6 +87,10 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // Audio and video are served here so browsers can fetch them in parts: iPhones won't play
+  // media without that, and it lets guests skip through long sets without downloading them whole.
+  if (MEDIA_PATH.test(url) && serveMedia(req, res)) return;
+
   // Proxy everything else to Nitro SSR
   proxyToNitro(req, res);
 });
@@ -98,6 +103,64 @@ server.listen(RENDER_PORT, "0.0.0.0", () => {
 });
 
 // ── Helpers ────────────────────────────────────────────────────────
+
+const MEDIA_PATH = /^\/(gallery|recordings)\/[\w.-]+(\/[\w.-]+)?\.(mp4|m4a|mp3)(\?.*)?$/;
+const MEDIA_TYPES = { ".mp4": "video/mp4", ".m4a": "audio/mp4", ".mp3": "audio/mpeg" };
+const PUBLIC_DIRS = [path.join(__dirname, ".output", "public"), path.join(__dirname, "public")];
+
+/**
+ * Serves a media file from the built public folder, honouring Range requests.
+ * Returns false when the file isn't there, so the request falls through to Nitro.
+ */
+function serveMedia(req, res) {
+  if (req.method !== "GET" && req.method !== "HEAD") return false;
+  const urlPath = decodeURIComponent(req.url.split("?")[0]);
+  if (urlPath.includes("..")) return false;
+
+  let file = null;
+  let size = 0;
+  for (const dir of PUBLIC_DIRS) {
+    const candidate = path.join(dir, urlPath);
+    try {
+      const stat = fs.statSync(candidate);
+      if (stat.isFile()) {
+        file = candidate;
+        size = stat.size;
+        break;
+      }
+    } catch {
+      // not in this folder
+    }
+  }
+  if (!file) return false;
+
+  const headers = {
+    "Content-Type": MEDIA_TYPES[path.extname(file)] || "application/octet-stream",
+    "Accept-Ranges": "bytes",
+    "Cache-Control": "public, max-age=604800",
+  };
+
+  const range = /^bytes=(\d*)-(\d*)$/.exec(req.headers.range || "");
+  if (range) {
+    let start = range[1] === "" ? size - Number(range[2]) : Number(range[1]);
+    let end = range[1] === "" || range[2] === "" ? size - 1 : Math.min(Number(range[2]), size - 1);
+    if (Number.isNaN(start) || start < 0) start = 0;
+    if (start > end || start >= size) {
+      res.writeHead(416, { "Content-Range": `bytes */${size}` });
+      res.end();
+      return true;
+    }
+    res.writeHead(206, { ...headers, "Content-Range": `bytes ${start}-${end}/${size}`, "Content-Length": end - start + 1 });
+    if (req.method === "HEAD") return res.end(), true;
+    fs.createReadStream(file, { start, end }).pipe(res);
+    return true;
+  }
+
+  res.writeHead(200, { ...headers, "Content-Length": size });
+  if (req.method === "HEAD") return res.end(), true;
+  fs.createReadStream(file).pipe(res);
+  return true;
+}
 
 /** Proxy a request to the internal Nitro SSR server */
 function proxyToNitro(req, res) {
