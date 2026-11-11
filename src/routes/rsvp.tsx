@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -9,7 +9,14 @@ import { DigitalTicketPass, type DigitalTicketPassProps } from "@/components/Dig
 import { BACKEND_URL } from "@/lib/backend";
 import { CheckCircle2, Search, X, Mail, Ticket } from "lucide-react";
 
+// RSVPs are paused, so this page sends visitors home. To bring it back, set this to false
+// and add RSVP back to the links in src/components/SiteHeader.tsx.
+const RSVP_PAUSED = true;
+
 export const Route = createFileRoute("/rsvp")({
+  beforeLoad: () => {
+    if (RSVP_PAUSED) throw redirect({ to: "/", replace: true });
+  },
   // Public: invited guests open this from their email and may not have an account.
   component: RsvpPage,
   head: () => ({ meta: [{ title: "RSVP — TheZuriXperience" }] }),

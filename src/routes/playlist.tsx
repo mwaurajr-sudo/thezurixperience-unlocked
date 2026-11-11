@@ -93,7 +93,7 @@ function PlaylistPage() {
               Enter your ticket code.
             </h2>
             <p className="mt-4 break-words text-sm text-primary/70">
-              It's on your pass. No ticket yet? RSVP to get one.
+              It's on your pass.
             </p>
             <form onSubmit={onSubmit} className="mt-6 flex flex-col gap-3 sm:flex-row">
               <input

@@ -6,7 +6,6 @@ import logo from "@/assets/zuri-logo.jpeg";
 const links = [
   { label: "About", to: "/about" as const },
   { label: "Event", to: "/event" as const },
-  { label: "RSVP", to: "/rsvp" as const },
   { label: "Playlist", to: "/playlist" as const },
   { label: "Recordings", to: "/recordings" as const },
   { label: "Gallery", to: "/gallery" as const },
