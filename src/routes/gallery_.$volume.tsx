@@ -132,17 +132,26 @@ function ScatterWall({ volume }: { volume: GalleryVolume }) {
               onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setOpen(i)}
               tabIndex={0}
               role="button"
-              aria-label={`Open photo ${i + 1} of ${volume.photos.length}`}
+              aria-label={`Open ${p.video ? "clip" : "photo"} ${i + 1} of ${volume.photos.length}`}
             >
               {i % 3 === 0 && <span className="zx-tape" aria-hidden />}
-              <img
-                src={p.src}
-                width={p.width}
-                height={p.height}
-                alt={`Volume ${Number(volume.vol)}, photo ${i + 1}`}
-                loading={i < 6 ? "eager" : "lazy"}
-                draggable={false}
-              />
+              {p.video ? (
+                <WallClip src={p.video} poster={p.src} width={p.width} height={p.height} />
+              ) : (
+                <img
+                  src={p.src}
+                  width={p.width}
+                  height={p.height}
+                  alt={`Volume ${Number(volume.vol)}, photo ${i + 1}`}
+                  loading={i < 6 ? "eager" : "lazy"}
+                  draggable={false}
+                />
+              )}
+              {p.video && (
+                <span className="zx-play" aria-hidden>
+                  ▶
+                </span>
+              )}
               <figcaption>
                 ZURI · VOL.{volume.vol} · #{String(i + 1).padStart(2, "0")}
               </figcaption>
@@ -155,6 +164,46 @@ function ScatterWall({ volume }: { volume: GalleryVolume }) {
         <Lightbox volume={volume} index={open} onIndex={setOpen} onClose={() => setOpen(null)} />
       )}
     </>
+  );
+}
+
+/**
+ * A clip on the wall: silent and looping, playing only while it is on screen
+ * so a long volume doesn't run every clip at once.
+ */
+function WallClip({ src, poster, width, height }: { src: string; poster: string; width: number; height: number }) {
+  const ref = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = ref.current;
+    if (!video) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) video.play().catch(() => {});
+        else video.pause();
+      },
+      { threshold: 0.25 }
+    );
+    observer.observe(video);
+    return () => {
+      observer.disconnect();
+      video.pause();
+    };
+  }, []);
+
+  return (
+    <video
+      ref={ref}
+      src={src}
+      poster={poster}
+      width={width}
+      height={height}
+      muted
+      loop
+      playsInline
+      preload="metadata"
+      aria-hidden
+    />
   );
 }
 
@@ -206,12 +255,25 @@ function Lightbox({
         </button>
       </div>
       <div className="relative flex min-h-0 flex-1 items-center justify-center px-4 pb-6">
-        <img
-          src={p.src}
-          alt={`Volume ${Number(volume.vol)}, photo ${index + 1}`}
-          className="max-h-full max-w-full border border-primary/30 object-contain shadow-[0_0_40px_oklch(0.62_0.24_25/0.25)]"
-          onClick={(e) => e.stopPropagation()}
-        />
+        {p.video ? (
+          <video
+            key={p.video}
+            src={p.video}
+            poster={p.src}
+            controls
+            autoPlay
+            playsInline
+            className="max-h-full max-w-full border border-primary/30 bg-black object-contain shadow-[0_0_40px_oklch(0.62_0.24_25/0.25)]"
+            onClick={(e) => e.stopPropagation()}
+          />
+        ) : (
+          <img
+            src={p.src}
+            alt={`Volume ${Number(volume.vol)}, photo ${index + 1}`}
+            className="max-h-full max-w-full border border-primary/30 object-contain shadow-[0_0_40px_oklch(0.62_0.24_25/0.25)]"
+            onClick={(e) => e.stopPropagation()}
+          />
+        )}
         <button
           type="button"
           aria-label="Previous photo"

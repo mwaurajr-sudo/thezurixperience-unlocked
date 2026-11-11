@@ -2,9 +2,12 @@
 // To add a volume: drop its photos in a new folder there and add an entry below.
 
 export type GalleryPhoto = {
+  /** The photo, or for a clip the still frame shown while it loads. */
   src: string;
   width: number;
   height: number;
+  /** Set for a short clip: the video file, played silently on the wall and with sound when opened. */
+  video?: string;
 };
 
 export type GalleryVolume = {
@@ -21,6 +24,14 @@ const photo = (slug: string, n: number, width = 960, height = 1280): GalleryPhot
   height,
 });
 
+// A clip saved as NN.mp4 with its still frame as NN-poster.jpg.
+const clip = (slug: string, n: number, width = 720, height = 1280): GalleryPhoto => ({
+  src: `/gallery/${slug}/${String(n).padStart(2, "0")}-poster.jpg`,
+  video: `/gallery/${slug}/${String(n).padStart(2, "0")}.mp4`,
+  width,
+  height,
+});
+
 export const volumes: GalleryVolume[] = [
   {
     slug: "volume-1",
@@ -30,10 +41,12 @@ export const volumes: GalleryVolume[] = [
     photos: [
       photo("volume-1", 1),
       photo("volume-1", 2),
+      clip("volume-1", 14),
       photo("volume-1", 3),
       photo("volume-1", 4),
       photo("volume-1", 5),
       photo("volume-1", 6),
+      clip("volume-1", 15, 576, 1024),
       photo("volume-1", 7, 720, 1280),
       photo("volume-1", 8, 720, 1280),
       photo("volume-1", 9),
