@@ -39,7 +39,12 @@ function EventPage() {
     ["Lineup", lineupText],
   ];
 
-  const tags = e.tags.split(",").map((t) => t.trim()).filter(Boolean);
+  // Between chapters the page says the next one is coming instead of showing the last one.
+  const announced = e.announced === true;
+  const tags = (announced ? e.tags : "Next chapter, Coming soon, TheZuriXperience, Nairobi")
+    .split(",")
+    .map((t) => t.trim())
+    .filter(Boolean);
 
   return (
     <div className="min-h-screen bg-black text-primary">
@@ -61,6 +66,14 @@ function EventPage() {
 
         {loading ? (
           <p className="mt-10 font-mono text-sm text-primary/60">loading...</p>
+        ) : !announced ? (
+          <div className="mt-10 font-mono">
+            <p className="text-xs uppercase tracking-[0.4em] text-primary/60">Next chapter</p>
+            <h2 className="mt-3 text-4xl uppercase tracking-[0.15em] text-primary">Coming soon</h2>
+            <p className="mt-4 italic text-primary/80">
+              The next date, place and lineup land here first. Stay close.
+            </p>
+          </div>
         ) : (
           <>
             <div className="mt-10 font-mono">
