@@ -54,6 +54,13 @@ export const volumes: GalleryVolume[] = [
       photo("volume-1", 11),
       photo("volume-1", 12, 720, 1280),
       photo("volume-1", 13, 720, 1280),
+      photo("volume-1", 16, 720, 1280),
+      photo("volume-1", 17, 1280, 720),
+      clip("volume-1", 21, 464, 832),
+      photo("volume-1", 18, 1280, 1280),
+      photo("volume-1", 19, 1280, 720),
+      clip("volume-1", 22, 464, 832),
+      photo("volume-1", 20, 960, 1280),
     ],
   },
 ];
