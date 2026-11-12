@@ -141,7 +141,9 @@ function UnlockedPlaylist({ tracks }: { tracks: string[] }) {
         Welcome to the house.
       </h2>
       <p className="mt-4 break-words text-sm text-primary/70">
-        Vol. {content.event.vol} — {content.event.name}. Familiarise yourself.
+        {content.event.announced === true
+          ? `Vol. ${content.event.vol} — ${content.event.name}. Familiarise yourself.`
+          : "Familiarise yourself."}
       </p>
 
       {content.playlists.length === 0 ? (

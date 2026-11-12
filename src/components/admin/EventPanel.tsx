@@ -10,6 +10,7 @@ import {
   ThreeCol,
 } from "@/components/admin/AdminFields";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 
 export function EventPanel() {
   const { content, setContent, saveSection } = useAdminContent();
@@ -28,6 +29,19 @@ export function EventPanel() {
   return (
     <div className="space-y-6">
       <PanelHeader title="Event Details" description="Update the current chapter — name, date, location, dress code, and lineup." />
+
+      <SectionCard title="Visibility">
+        <label className="flex items-start justify-between gap-4">
+          <span>
+            <span className="block text-sm font-medium">Show event details on the site</span>
+            <span className="mt-1 block text-xs text-muted-foreground">
+              Off: the Event page says the next chapter is coming soon. Turn it on once this chapter's details are ready,
+              then save.
+            </span>
+          </span>
+          <Switch checked={event.announced === true} onCheckedChange={(on) => set({ announced: on })} />
+        </label>
+      </SectionCard>
 
       <SectionCard title="Chapter info">
         <TwoCol>

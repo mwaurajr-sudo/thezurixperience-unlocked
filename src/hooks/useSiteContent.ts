@@ -16,6 +16,8 @@ export interface EventDetails {
   dj2: string;
   dj3: string;
   lineupMode: "secret" | "partial" | "full";
+  /** The Event page shows these details only when true, so a past chapter stays hidden until the next is announced. */
+  announced?: boolean;
 }
 
 export interface TicketTier {
@@ -64,6 +66,7 @@ const defaultContent: PublicSiteContent = {
     dj2: "",
     dj3: "",
     lineupMode: "secret",
+    announced: false,
   },
   tickets: [
     { name: "Pass", cap: 99, sold: 0, perks: "" },
