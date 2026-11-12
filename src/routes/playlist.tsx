@@ -165,31 +165,39 @@ function UnlockedPlaylist({ tracks }: { tracks: string[] }) {
 
       <div className="mt-14 border-t border-primary/40 pt-8">
         <p className="text-xs uppercase tracking-[0.3em] text-primary/60">
-          [tracklist] {tracks.length} tracks
+          [tracklist]{tracks.length > 0 && ` ${tracks.length} tracks`}
         </p>
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="search tracks..."
-          aria-label="Search tracks"
-          className="mt-4 w-full border border-primary/40 bg-black px-3 py-3 text-base text-primary placeholder:text-primary/30 focus:border-primary focus:outline-none sm:text-sm"
-        />
-        {visibleTracks.length === 0 ? (
-          <p className="mt-6 break-words text-sm text-primary/60">No track matches "{query}".</p>
+        {tracks.length === 0 ? (
+          <p className="mt-6 break-words text-sm text-primary/60">
+            A new tracklist drops before the next event. Check back soon.
+          </p>
         ) : (
-          <ol className="mt-6">
-            {visibleTracks.map((t) => (
-              <li
-                key={t.n}
-                className="flex gap-3 border-b border-primary/20 py-2.5 text-sm hover:bg-primary/10 sm:gap-4"
-              >
-                <span className="w-8 shrink-0 text-primary/50">
-                  {String(t.n).padStart(3, "0")}
-                </span>
-                <span className="min-w-0 flex-1 break-words text-primary">{t.title}</span>
-              </li>
-            ))}
-          </ol>
+          <>
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="search tracks..."
+            aria-label="Search tracks"
+            className="mt-4 w-full border border-primary/40 bg-black px-3 py-3 text-base text-primary placeholder:text-primary/30 focus:border-primary focus:outline-none sm:text-sm"
+          />
+          {visibleTracks.length === 0 ? (
+            <p className="mt-6 break-words text-sm text-primary/60">No track matches "{query}".</p>
+          ) : (
+            <ol className="mt-6">
+              {visibleTracks.map((t) => (
+                <li
+                  key={t.n}
+                  className="flex gap-3 border-b border-primary/20 py-2.5 text-sm hover:bg-primary/10 sm:gap-4"
+                >
+                  <span className="w-8 shrink-0 text-primary/50">
+                    {String(t.n).padStart(3, "0")}
+                  </span>
+                  <span className="min-w-0 flex-1 break-words text-primary">{t.title}</span>
+                </li>
+              ))}
+            </ol>
+          )}
+          </>
         )}
       </div>
     </section>
