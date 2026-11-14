@@ -34,5 +34,5 @@ export const hostedRecordings: HostedRecording[] = [
 export const downloadName = (r: HostedRecording) =>
   `${r.title.replace(/[\\/:*?"<>|]/g, "")} - TheZuriXperience${r.src.slice(r.src.lastIndexOf("."))}`;
 
-/** Where the download button points: the file itself, which the site serves directly. */
-export const downloadUrl = (r: HostedRecording) => r.src;
+/** Where the download button points: the site's download route, which saves the file from R2 (see src/routes/api/recordings). */
+export const downloadUrl = (r: HostedRecording) => `/api/recordings/download/${r.src.slice(r.src.lastIndexOf("/") + 1)}`;
