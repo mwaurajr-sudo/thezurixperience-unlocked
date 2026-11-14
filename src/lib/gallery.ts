@@ -39,7 +39,7 @@ export const volumes: GalleryVolume[] = [
     title: "RnB Nights",
     date: "6th November",
     photos: [
-      photo("volume-1", 16, 720, 1280),
+      photo("volume-1", 23),
       photo("volume-1", 17, 1280, 720),
       clip("volume-1", 14),
       photo("volume-1", 3),
@@ -52,7 +52,7 @@ export const volumes: GalleryVolume[] = [
       photo("volume-1", 19, 1280, 720),
       clip("volume-1", 22, 464, 832),
       photo("volume-1", 20, 960, 1280),
-      photo("volume-1", 12, 720, 1280),
+      photo("volume-1", 16, 720, 1280),
       photo("volume-1", 13, 720, 1280),
     ],
   },
