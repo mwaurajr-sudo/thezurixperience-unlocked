@@ -24,3 +24,10 @@ export const hostedRecordings: HostedRecording[] = [
     duration: 3816,
   },
 ];
+
+/** The file name a set is saved under when downloaded, e.g. "Apartment Zuri - TheZuriXperience.m4a". */
+export const downloadName = (r: HostedRecording) =>
+  `${r.title.replace(/[\\/:*?"<>|]/g, "")} - TheZuriXperience${r.src.slice(r.src.lastIndexOf("."))}`;
+
+/** Where the download button points: the file itself, which the site serves directly. */
+export const downloadUrl = (r: HostedRecording) => r.src;

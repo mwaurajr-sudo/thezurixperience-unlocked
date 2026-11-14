@@ -3,7 +3,7 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { AuthGate } from "@/components/AuthGate";
 import { SiteHeader } from "@/components/SiteHeader";
 import { useSiteContent } from "@/hooks/useSiteContent";
-import { hostedRecordings, type HostedRecording } from "@/lib/recordings";
+import { downloadName, downloadUrl, hostedRecordings, type HostedRecording } from "@/lib/recordings";
 
 export const Route = createFileRoute("/recordings")({
   component: () => (
@@ -167,6 +167,14 @@ function SetPlayer({ recording }: { recording: HostedRecording }) {
         >
           [+30s]
         </button>
+        <a
+          href={downloadUrl(recording)}
+          download={downloadName(recording)}
+          aria-label={`Download ${recording.title}`}
+          className="text-xs uppercase tracking-[0.15em] text-primary/60 hover:text-primary"
+        >
+          [↓ download]
+        </a>
         <span className="ml-auto text-xs tabular-nums tracking-[0.15em] text-primary/60">
           {buffering && playing ? "loading... " : ""}
           {clock(time)} / {clock(duration)}
