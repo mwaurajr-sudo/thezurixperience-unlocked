@@ -8,6 +8,7 @@ import {
   Ticket,
   ShoppingBag,
   Disc3,
+  Music,
   Building2,
   Users,
   Settings,
@@ -27,6 +28,7 @@ export type AdminPanel =
   | "tickets"
   | "merch"
   | "playlists"
+  | "requests"
   | "brands"
   | "team"
   | "settings"
@@ -39,6 +41,7 @@ const navItems: Array<{ id: AdminPanel; label: string; icon: React.ElementType; 
   { id: "tickets", label: "Tickets & RSVPs", icon: Ticket, section: "Content" },
   { id: "merch", label: "Merch Drops", icon: ShoppingBag, section: "Content" },
   { id: "playlists", label: "Playlists", icon: Disc3, section: "Content" },
+  { id: "requests", label: "Song Requests", icon: Music, section: "Content" },
   { id: "brands", label: "Brand Partners", icon: Building2, section: "Content" },
   { id: "team", label: "Team", icon: Users, section: "Content" },
   { id: "settings", label: "Site Settings", icon: Settings, section: "Config" },
