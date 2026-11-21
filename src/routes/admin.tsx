@@ -9,9 +9,7 @@ import { EventPanel } from "@/components/admin/EventPanel";
 import { TicketsPanel } from "@/components/admin/TicketsPanel";
 import { SongRequestsPanel } from "@/components/admin/SongRequestsPanel";
 import {
-  MerchPanel,
   PlaylistsPanel,
-  BrandsPanel,
   TeamPanel,
   SiteSettingsPanel,
   AccessPanel,
@@ -37,10 +35,8 @@ function AdminPage() {
       {activePanel === "hero" && <HeroPanel />}
       {activePanel === "event" && <EventPanel />}
       {activePanel === "tickets" && <TicketsPanel />}
-      {activePanel === "merch" && <MerchPanel />}
       {activePanel === "playlists" && <PlaylistsPanel />}
       {activePanel === "requests" && <SongRequestsPanel />}
-      {activePanel === "brands" && <BrandsPanel />}
       {activePanel === "team" && <TeamPanel />}
       {activePanel === "settings" && <SiteSettingsPanel />}
       {activePanel === "access" && <AccessPanel />}
