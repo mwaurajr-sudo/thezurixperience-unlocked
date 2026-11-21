@@ -20,6 +20,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RsvpConfirmRouteImport } from './routes/rsvp_.confirm'
 import { Route as GalleryRouteImport } from './routes/gallery'
+import { Route as RequestsRouteImport } from './routes/requests'
 import { Route as GalleryVolumeRouteImport } from './routes/gallery_.$volume'
 
 const SettingsRoute = SettingsRouteImport.update({
@@ -77,6 +78,11 @@ const GalleryRoute = GalleryRouteImport.update({
   path: '/gallery',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RequestsRoute = RequestsRouteImport.update({
+  id: '/requests',
+  path: '/requests',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GalleryVolumeRoute = GalleryVolumeRouteImport.update({
   id: '/gallery_/$volume',
   path: '/gallery/$volume',
@@ -95,6 +101,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/rsvp/confirm': typeof RsvpConfirmRoute
   '/gallery': typeof GalleryRoute
+  '/requests': typeof RequestsRoute
   '/gallery/$volume': typeof GalleryVolumeRoute
 }
 export interface FileRoutesByTo {
@@ -109,6 +116,7 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/rsvp/confirm': typeof RsvpConfirmRoute
   '/gallery': typeof GalleryRoute
+  '/requests': typeof RequestsRoute
   '/gallery/$volume': typeof GalleryVolumeRoute
 }
 export interface FileRoutesById {
@@ -124,6 +132,7 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/rsvp_/confirm': typeof RsvpConfirmRoute
   '/gallery': typeof GalleryRoute
+  '/requests': typeof RequestsRoute
   '/gallery_/$volume': typeof GalleryVolumeRoute
 }
 export interface FileRouteTypes {
@@ -140,6 +149,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/rsvp/confirm'
     | '/gallery'
+    | '/requests'
     | '/gallery/$volume'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -154,6 +164,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/rsvp/confirm'
     | '/gallery'
+    | '/requests'
     | '/gallery/$volume'
   id:
     | '__root__'
@@ -168,6 +179,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/rsvp_/confirm'
     | '/gallery'
+    | '/requests'
     | '/gallery_/$volume'
   fileRoutesById: FileRoutesById
 }
@@ -183,6 +195,7 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   RsvpConfirmRoute: typeof RsvpConfirmRoute
   GalleryRoute: typeof GalleryRoute
+  RequestsRoute: typeof RequestsRoute
   GalleryVolumeRoute: typeof GalleryVolumeRoute
 }
 
@@ -265,6 +278,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GalleryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/requests': {
+      id: '/requests'
+      path: '/requests'
+      fullPath: '/requests'
+      preLoaderRoute: typeof RequestsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/gallery_/$volume': {
       id: '/gallery_/$volume'
       path: '/gallery/$volume'
@@ -287,6 +307,7 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   RsvpConfirmRoute: RsvpConfirmRoute,
   GalleryRoute: GalleryRoute,
+  RequestsRoute: RequestsRoute,
   GalleryVolumeRoute: GalleryVolumeRoute,
 }
 export const routeTree = rootRouteImport

@@ -343,3 +343,25 @@
   outline: 1px solid oklch(0.62 0.24 25 / 0.6);
   outline-offset: 6px;
 }
+
+/* ── Song requests: the pulsing "live" light ─────────────── */
+.zx-live-dot {
+  display: inline-block;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: oklch(0.62 0.24 25);
+  box-shadow: 0 0 0 0 oklch(0.62 0.24 25 / 0.7);
+  animation: zx-pulse 1.6s ease-out infinite;
+}
+.zx-live {
+  box-shadow: 0 0 30px oklch(0.62 0.24 25 / 0.18) inset;
+}
+@keyframes zx-pulse {
+  0% { box-shadow: 0 0 0 0 oklch(0.62 0.24 25 / 0.7); }
+  70% { box-shadow: 0 0 0 0.6rem oklch(0.62 0.24 25 / 0); }
+  100% { box-shadow: 0 0 0 0 oklch(0.62 0.24 25 / 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .zx-live-dot { animation: none; }
+}

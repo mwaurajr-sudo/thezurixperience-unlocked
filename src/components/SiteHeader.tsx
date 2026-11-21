@@ -7,6 +7,7 @@ const links = [
   { label: "About", to: "/about" as const },
   { label: "Event", to: "/event" as const },
   { label: "Playlist", to: "/playlist" as const },
+  { label: "Requests", to: "/requests" as const },
   { label: "Recordings", to: "/recordings" as const },
   { label: "Gallery", to: "/gallery" as const },
   { label: "Settings", to: "/settings" as const },
