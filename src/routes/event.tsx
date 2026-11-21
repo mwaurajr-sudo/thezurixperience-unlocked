@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AuthGate } from "@/components/AuthGate";
 import { SiteHeader } from "@/components/SiteHeader";
 import { useSiteContent } from "@/hooks/useSiteContent";
+import { Countdown } from "@/components/Countdown";
 
 export const Route = createFileRoute("/event")({
   component: () => (
@@ -73,6 +74,7 @@ function EventPage() {
             <p className="mt-4 italic text-primary/80">
               The next date, place and lineup land here first. Stay close.
             </p>
+            <Countdown startsAt={e.startsAt} label="Next chapter in" />
           </div>
         ) : (
           <>
@@ -83,6 +85,8 @@ function EventPage() {
               </h2>
               <p className="mt-4 italic text-primary/80">{e.theme}</p>
             </div>
+
+            <Countdown startsAt={e.startsAt} label={`Vol. ${e.vol} starts in`} />
 
             <dl className="mt-12 divide-y divide-primary/20 border-y border-primary/20 font-mono">
               {facts.map(([k, v]) => (

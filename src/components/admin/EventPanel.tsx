@@ -11,6 +11,7 @@ import {
 } from "@/components/admin/AdminFields";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { DEFAULT_COUNTDOWN, fromNairobiInput, toNairobiInput } from "@/lib/event-countdown";
 
 export function EventPanel() {
   const { content, setContent, saveSection } = useAdminContent();
@@ -41,6 +42,31 @@ export function EventPanel() {
           </span>
           <Switch checked={event.announced === true} onCheckedChange={(on) => set({ announced: on })} />
         </label>
+      </SectionCard>
+
+      <SectionCard title="Countdown">
+        <TextField
+          label="Count down to (Nairobi time)"
+          type="datetime-local"
+          value={event.startsAt === "" ? "" : toNairobiInput(event.startsAt ?? DEFAULT_COUNTDOWN)}
+          onChange={(v) => set({ startsAt: fromNairobiInput(v) })}
+          hint={
+            event.startsAt === ""
+              ? "Countdown is off. Pick a date and time to show it on the Event page, then save."
+              : "Shows on the Event page, even before the details are announced. It says \"We're live\" when doors open and disappears 6 hours later. Save after changing."
+          }
+        />
+        <div className="flex gap-2">
+          {event.startsAt === "" ? (
+            <Button variant="outline" size="sm" className="rounded-full text-xs" onClick={() => set({ startsAt: DEFAULT_COUNTDOWN })}>
+              Turn countdown back on
+            </Button>
+          ) : (
+            <Button variant="outline" size="sm" className="rounded-full text-xs" onClick={() => set({ startsAt: "" })}>
+              Hide countdown
+            </Button>
+          )}
+        </div>
       </SectionCard>
 
       <SectionCard title="Chapter info">
