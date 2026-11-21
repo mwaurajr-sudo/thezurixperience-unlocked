@@ -365,3 +365,24 @@
 @media (prefers-reduced-motion: reduce) {
   .zx-live-dot { animation: none; }
 }
+
+/* ── Event countdown ─────────────────────────────────────── */
+.zx-count-digit {
+  color: oklch(0.62 0.24 25);
+  text-shadow: 0 0 18px oklch(0.62 0.24 25 / 0.45);
+}
+.zx-countdown-soon .zx-count-digit,
+.zx-countdown-live .zx-count-digit {
+  animation: zx-flicker 2.4s infinite;
+  text-shadow: 0 0 26px oklch(0.7 0.26 25 / 0.75);
+}
+@keyframes zx-flicker {
+  0%, 92%, 100% { opacity: 1; }
+  93% { opacity: 0.55; }
+  95% { opacity: 1; }
+  97% { opacity: 0.7; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .zx-countdown-soon .zx-count-digit,
+  .zx-countdown-live .zx-count-digit { animation: none; }
+}

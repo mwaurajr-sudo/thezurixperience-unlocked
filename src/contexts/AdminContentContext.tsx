@@ -19,6 +19,8 @@ export interface EventDetails {
   lineupMode: "secret" | "partial" | "full";
   /** The Event page shows these details only when true. */
   announced?: boolean;
+  /** When the Event page countdown ends, e.g. "2027-01-20T19:00:00+03:00". Empty hides it; unset uses the default. */
+  startsAt?: string;
 }
 
 export interface TicketTier {
