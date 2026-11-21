@@ -7,10 +7,8 @@ import {
   CalendarDays,
   Ticket,
   Mail,
-  ShoppingBag,
   Disc3,
   Music,
-  Building2,
   Users,
   Settings,
   ShieldCheck,
@@ -28,10 +26,8 @@ export type AdminPanel =
   | "event"
   | "tickets"
   | "email"
-  | "merch"
   | "playlists"
   | "requests"
-  | "brands"
   | "team"
   | "settings"
   | "access";
@@ -42,10 +38,8 @@ const navItems: Array<{ id: AdminPanel; label: string; icon: React.ElementType; 
   { id: "event", label: "Event Details", icon: CalendarDays, section: "Content" },
   { id: "tickets", label: "Tickets & RSVPs", icon: Ticket, section: "Content" },
   { id: "email", label: "Email", icon: Mail, section: "Content" },
-  { id: "merch", label: "Merch Drops", icon: ShoppingBag, section: "Content" },
   { id: "playlists", label: "Playlists", icon: Disc3, section: "Content" },
   { id: "requests", label: "Song Requests", icon: Music, section: "Content" },
-  { id: "brands", label: "Brand Partners", icon: Building2, section: "Content" },
   { id: "team", label: "Team", icon: Users, section: "Content" },
   { id: "settings", label: "Site Settings", icon: Settings, section: "Config" },
   { id: "access", label: "Access Control", icon: ShieldCheck, section: "Config" },

@@ -2,7 +2,7 @@ import { useAdminContent } from "@/contexts/AdminContentContext";
 import { PanelHeader } from "@/components/admin/AdminFields";
 import type { AdminPanel } from "@/components/AdminLayout";
 import { usePassesLeft } from "@/hooks/usePassesLeft";
-import { CalendarDays, Ticket, ShoppingBag, Users, ArrowRight } from "lucide-react";
+import { Ticket, Users, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface Props {
@@ -20,9 +20,7 @@ export function DashboardPanel({ onNavigate }: Props) {
 
   const stats = [
     { label: "Tickets remaining", value: totalLeft, sub: `${fillPct}% capacity filled`, icon: Ticket, panel: "tickets" as AdminPanel },
-    { label: "Merch items", value: content.merch.length, sub: `${content.merch.filter((m) => m.status === "live").length} live`, icon: ShoppingBag, panel: "merch" as AdminPanel },
     { label: "Team members", value: content.team.length, sub: "Curators listed", icon: Users, panel: "team" as AdminPanel },
-    { label: "Brand partners", value: content.brands.length, sub: "Active collaborators", icon: CalendarDays, panel: "brands" as AdminPanel },
   ];
 
   return (
@@ -58,7 +56,7 @@ export function DashboardPanel({ onNavigate }: Props) {
       </div>
 
       {/* Stats grid */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2">
         {stats.map((s) => (
           <button
             key={s.label}
